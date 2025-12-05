@@ -1,0 +1,206 @@
+.excalidraw {
+  .app-sidebar-promo-container {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    flex: 1 1 auto;
+  }
+
+  .app-sidebar-promo-image {
+    margin: 1rem 0;
+
+    height: 16.25rem;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    background-image: radial-gradient(
+        circle,
+        transparent 60%,
+        var(--sidebar-bg-color) 100%
+      ),
+      var(--image-source);
+
+    display: flex;
+  }
+
+  .app-sidebar-promo-text {
+    padding: 0 2rem;
+  }
+
+  .link-button {
+    margin: 0 auto;
+  }
+
+  // Presentation Panel styles
+  .presentation-panel {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+
+    &__header {
+      h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--color-primary);
+      }
+    }
+
+    &__description {
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    &__empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      text-align: center;
+      flex: 1;
+
+      &-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.6;
+      }
+
+      p {
+        margin: 0.25rem 0;
+        color: var(--color-text-secondary);
+      }
+    }
+
+    &__hint {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    &__slides {
+      background: var(--color-surface-low);
+      border-radius: 8px;
+      padding: 0.75rem;
+
+      &-header {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      &-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+    }
+
+    &__slide-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.15s;
+
+      &:hover {
+        background: var(--color-surface-mid);
+      }
+    }
+
+    &__slide-number {
+      width: 24px;
+      height: 24px;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    &__slide-name {
+      font-size: 0.9rem;
+      color: var(--color-text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__start-btn {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s, opacity 0.15s;
+
+      &:hover:not(:disabled) {
+        background: var(--color-primary-darker);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    &__shortcuts {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border);
+
+      h4 {
+        margin: 0 0 0.75rem 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+      }
+
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0;
+        font-size: 0.8rem;
+        color: var(--color-text-secondary);
+      }
+
+      kbd {
+        display: inline-block;
+        padding: 0.15rem 0.4rem;
+        background: var(--color-surface-mid);
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.75rem;
+        color: var(--color-text);
+      }
+    }
+  }
+}

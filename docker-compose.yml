@@ -1,0 +1,35 @@
+services:
+  excalidraw:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_APP_WS_SERVER_URL=http://192.168.0.81:3005
+    container_name: excalidraw-app
+    ports:
+      - "3002:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    # depends_on:
+    #   - collaboration
+    networks:
+      - excalidraw-net
+
+  # collaboration:
+  #   build:
+  #     context: ./excalidraw-room
+  #     dockerfile: Dockerfile
+  #   container_name: excalidraw-collab
+  #   ports:
+  #     - "3005:3005"
+  #   restart: unless-stopped
+  #   environment:
+  #     - PORT=3005
+  #     - CORS_ORIGIN=*
+  #   networks:
+  #     - excalidraw-net
+
+networks:
+  excalidraw-net:
+    driver: bridge
