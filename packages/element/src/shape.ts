@@ -14,12 +14,6 @@ import {
   pointDistance,
   type LocalPoint,
   pointRotateRads,
-  getBoxVertices,
-  getBoxEdges,
-  transformPoint,
-  createRotationMatrix,
-  projectTo2D,
-  type Point3D,
 } from "@excalidraw/math";
 import {
   ROUGHNESS,
@@ -610,19 +604,38 @@ export const generateLinearCollisionShape = (
   }
 };
 
+interface Shape3DElementInput {
+  width: number;
+  height: number;
+  strokeWidth?: number;
+  strokeColor?: string;
+  strokeStyle?: "solid" | "dashed" | "dotted";
+  seed?: number;
+  roughness?: number;
+  roundness?: { type: number; value?: number } | null;
+  backgroundColor?: string;
+  fillStyle?: string;
+  customData?: {
+    shape3d?: {
+      rotationX?: number;
+      rotationY?: number;
+      rotationZ?: number;
+      depth?: number;
+      perspective?: number;
+    };
+  };
+}
+
 /**
  * Generates 3D rectangular shapes (cube or rectangular prism) as an array of line drawables
  * Uses proper isometric projection like Visio with exact 30-degree angles
  */
 const generate3DRectangularShapes = (
-  element: { width: number; height: number; customData?: any },
+  element: Shape3DElementInput,
   generator: RoughGenerator,
   isCube: boolean = false,
-): any[] => {
+): Drawable[] => {
   const shape3d = element.customData?.shape3d || {};
-  const rotX = shape3d.rotationX !== undefined ? shape3d.rotationX : 0;
-  const rotY = shape3d.rotationY !== undefined ? shape3d.rotationY : 0;
-  const rotZ = shape3d.rotationZ !== undefined ? shape3d.rotationZ : 0;
   const depth = shape3d.depth || (isCube ? element.width : element.width * 0.6);
 
   const w = element.width;
@@ -653,19 +666,11 @@ const generate3DRectangularShapes = (
   // - Negative depth: back face is down-left from front face
 
   // Calculate maximum possible depth based on element size
-  const maxPossibleDepthFromWidth = w / xScale;
-  const maxPossibleDepthFromHeight = h / yScale;
-  const maxPossibleDepth = Math.min(
-    maxPossibleDepthFromWidth,
-    maxPossibleDepthFromHeight,
-  );
+  // Depth is constrained so the 3D shape fits within the element bounds
+  const maxDepth = Math.min(w / xScale, h / yScale);
 
-  // Clamp depth to reasonable range (can be positive or negative)
-  const maxAllowedDepth = maxPossibleDepth * 0.8;
-  const effectiveDepth = Math.max(
-    -maxAllowedDepth,
-    Math.min(maxAllowedDepth, d),
-  );
+  // Clamp depth to valid range (positive = forward, negative = backward)
+  const effectiveDepth = Math.max(-maxDepth, Math.min(maxDepth, d));
 
   // Calculate isometric depth offsets (use absolute value for sizing)
   const depthOffsetX = Math.abs(effectiveDepth) * xScale;
@@ -675,14 +680,10 @@ const generate3DRectangularShapes = (
   const faceWidth = w - depthOffsetX;
   const faceHeight = h - depthOffsetY;
 
-  // Both cube and rectangular prism use full available space
-  // This ensures the shape fills the entire bounding box
-  const totalWidth = faceWidth + depthOffsetX;
-  const totalHeight = faceHeight + depthOffsetY;
-
   // Center in the element bounds
-  const offsetX = (w - totalWidth) / 2;
-  const offsetY = (h - totalHeight) / 2;
+  // Total size = faceWidth + depthOffsetX and faceHeight + depthOffsetY
+  const offsetX = (w - (faceWidth + depthOffsetX)) / 2;
+  const offsetY = (h - (faceHeight + depthOffsetY)) / 2;
 
   // Define 8 vertices - all MUST be within [0, w] x [0, h]
   // Position depends on whether depth is positive (forward) or negative (backward)
@@ -781,7 +782,10 @@ const generate3DRectangularShapes = (
 
   // Check if edge should be visible (at least one adjacent face is visible)
   const isEdgeVisible = (startIdx: number, endIdx: number): boolean => {
-    const edgeKey = `${Math.min(startIdx, endIdx)},${Math.max(startIdx, endIdx)}`;
+    const edgeKey = `${Math.min(startIdx, endIdx)},${Math.max(
+      startIdx,
+      endIdx,
+    )}`;
     const adjacentFaces = edgeToFaces.get(edgeKey) || [];
     return adjacentFaces.some((faceIdx) => faceVisibility[faceIdx]);
   };
@@ -806,36 +810,34 @@ const generate3DRectangularShapes = (
   ];
 
   // Get styling from element
-  const el = element as any;
-  const strokeWidth = el.strokeWidth || 2;
+  const strokeWidth = element.strokeWidth || 2;
   const options = {
-    seed: el.seed,
-    strokeWidth: el.strokeStyle !== "solid" ? strokeWidth + 0.5 : strokeWidth,
-    stroke: el.strokeColor || "#000000",
-    roughness: adjustRoughness(el),
+    seed: element.seed,
+    strokeWidth:
+      element.strokeStyle !== "solid" ? strokeWidth + 0.5 : strokeWidth,
+    stroke: element.strokeColor || "#000000",
+    roughness: element.roughness || 1,
     strokeLineDash:
-      el.strokeStyle === "dashed"
+      element.strokeStyle === "dashed"
         ? getDashArrayDashed(strokeWidth)
-        : el.strokeStyle === "dotted"
+        : element.strokeStyle === "dotted"
         ? getDashArrayDotted(strokeWidth)
         : undefined,
-    disableMultiStroke: el.strokeStyle !== "solid",
+    disableMultiStroke: element.strokeStyle !== "solid",
   };
 
   // Create line shapes for each edge
-  const shapes: any[] = [];
+  const shapes: Drawable[] = [];
 
   // Check if element has roundness and calculate corner radius
-  // If roundness.value is explicitly set, use it directly as the radius (clamped to reasonable limits)
-  // Otherwise, fall back to the adaptive radius calculation
   const maxPossibleRadius =
     Math.min(faceWidth, faceHeight, Math.abs(effectiveDepth) * 0.5) / 2;
-  const cornerRadius = el.roundness
-    ? el.roundness.value !== undefined
-      ? Math.min(el.roundness.value, maxPossibleRadius)
+  const cornerRadius = element.roundness
+    ? element.roundness.value !== undefined
+      ? Math.min(element.roundness.value, maxPossibleRadius)
       : getCornerRadius(
           Math.min(faceWidth, faceHeight, Math.abs(effectiveDepth) * 0.5),
-          el,
+          element as ExcalidrawElement,
         )
     : 0;
 
@@ -888,144 +890,91 @@ const generate3DRectangularShapes = (
       `;
     };
 
-    // Draw rounded edges for VISIBLE faces only
+    // Draw rounded edges for VISIBLE faces only using data-driven approach
     const v = centeredVertices;
 
-    // Face indices: 0=front, 1=back, 2=left, 3=right, 4=top, 5=bottom
-    // Only draw faces that are front-facing
-    if (faceVisibility[0]) {
-      // Front face (0-1-5-4)
-      shapes.push(
-        generator.path(createRoundedFacePath(v[0], v[1], v[5], v[4]), options),
-      );
-    }
+    // Face configurations: visIdx = faceVisibility index, verts = vertex indices
+    const roundedFaceConfigs = [
+      { visIdx: 0, verts: [0, 1, 5, 4] }, // Front
+      { visIdx: 4, verts: [4, 5, 6, 7] }, // Top
+      { visIdx: 3, verts: [1, 2, 6, 5] }, // Right
+      { visIdx: 1, verts: [3, 7, 6, 2] }, // Back
+      { visIdx: 5, verts: [0, 3, 2, 1] }, // Bottom
+      { visIdx: 2, verts: [0, 4, 7, 3] }, // Left
+    ];
 
-    if (faceVisibility[4]) {
-      // Top face (4-5-6-7)
-      shapes.push(
-        generator.path(createRoundedFacePath(v[4], v[5], v[6], v[7]), options),
-      );
-    }
-
-    if (faceVisibility[3]) {
-      // Right face (1-2-6-5)
-      shapes.push(
-        generator.path(createRoundedFacePath(v[1], v[2], v[6], v[5]), options),
-      );
-    }
-
-    // Also draw back-facing faces that become visible with negative depth
-    if (faceVisibility[1]) {
-      // Back face (3-7-6-2)
-      shapes.push(
-        generator.path(createRoundedFacePath(v[3], v[7], v[6], v[2]), options),
-      );
-    }
-
-    if (faceVisibility[5]) {
-      // Bottom face (0-3-2-1)
-      shapes.push(
-        generator.path(createRoundedFacePath(v[0], v[3], v[2], v[1]), options),
-      );
-    }
-
-    if (faceVisibility[2]) {
-      // Left face (0-4-7-3)
-      shapes.push(
-        generator.path(createRoundedFacePath(v[0], v[4], v[7], v[3]), options),
-      );
-    }
+    roundedFaceConfigs.forEach(({ visIdx, verts }) => {
+      if (faceVisibility[visIdx]) {
+        const [i0, i1, i2, i3] = verts;
+        shapes.push(
+          generator.path(
+            createRoundedFacePath(v[i0], v[i1], v[i2], v[i3]),
+            options,
+          ),
+        );
+      }
+    });
   } else {
     // Draw only visible edges (with back-face culling)
     edges.forEach(([startIdx, endIdx]) => {
       if (isEdgeVisible(startIdx, endIdx)) {
         const start = centeredVertices[startIdx];
         const end = centeredVertices[endIdx];
-        const lineShape = generator.line(start.x, start.y, end.x, end.y, options);
+        const lineShape = generator.line(
+          start.x,
+          start.y,
+          end.x,
+          end.y,
+          options,
+        );
         shapes.push(lineShape);
       }
     });
   }
 
   // Optionally add filled faces if backgroundColor is set
-  if (el.backgroundColor && !isTransparent(el.backgroundColor)) {
-    // Create proper fill options for rough.js
+  if (element.backgroundColor && !isTransparent(element.backgroundColor)) {
     const faceFillOptions = {
-      seed: el.seed,
-      roughness: adjustRoughness(el),
-      fill: el.backgroundColor,
-      fillStyle: el.fillStyle || "solid",
+      seed: element.seed,
+      roughness: element.roughness || 1,
+      fill: element.backgroundColor,
+      fillStyle: element.fillStyle || "solid",
       fillWeight: strokeWidth / 2,
       hachureGap: strokeWidth * 4,
-      stroke: "none", // No stroke on faces - edges are drawn separately
+      stroke: "none",
       strokeWidth: 0,
     };
 
-    // Draw ALL 6 faces of the cube for complete fill coverage
-    // Vertices order: counter-clockwise when looking at each face
-
-    // 1. Front face (0-1-5-4)
-    const frontFacePoints: [number, number][] = [
-      [centeredVertices[0].x, centeredVertices[0].y],
-      [centeredVertices[1].x, centeredVertices[1].y],
-      [centeredVertices[5].x, centeredVertices[5].y],
-      [centeredVertices[4].x, centeredVertices[4].y],
+    // Face definitions with vertex indices and visibility index
+    const faceConfigs = [
+      { visIdx: 0, verts: [0, 1, 5, 4] }, // Front
+      { visIdx: 1, verts: [3, 7, 6, 2] }, // Back
+      { visIdx: 2, verts: [0, 4, 7, 3] }, // Left
+      { visIdx: 3, verts: [1, 2, 6, 5] }, // Right
+      { visIdx: 4, verts: [4, 5, 6, 7] }, // Top
+      { visIdx: 5, verts: [0, 3, 2, 1] }, // Bottom
     ];
-    const frontFace = generator.polygon(frontFacePoints, faceFillOptions);
 
-    // 2. Back face (3-7-6-2)
-    const backFacePoints: [number, number][] = [
-      [centeredVertices[3].x, centeredVertices[3].y],
-      [centeredVertices[7].x, centeredVertices[7].y],
-      [centeredVertices[6].x, centeredVertices[6].y],
-      [centeredVertices[2].x, centeredVertices[2].y],
-    ];
-    const backFace = generator.polygon(backFacePoints, faceFillOptions);
+    // Only draw VISIBLE faces, sorted back-to-front by average Y
+    const visibleFaces = faceConfigs
+      .filter((f) => faceVisibility[f.visIdx])
+      .map((f) => ({
+        ...f,
+        avgY: f.verts.reduce((sum, i) => sum + centeredVertices[i].y, 0) / 4,
+      }))
+      .sort((a, b) => a.avgY - b.avgY); // Back-to-front by Y
 
-    // 3. Left face (0-4-7-3)
-    const leftFacePoints: [number, number][] = [
-      [centeredVertices[0].x, centeredVertices[0].y],
-      [centeredVertices[4].x, centeredVertices[4].y],
-      [centeredVertices[7].x, centeredVertices[7].y],
-      [centeredVertices[3].x, centeredVertices[3].y],
-    ];
-    const leftFace = generator.polygon(leftFacePoints, faceFillOptions);
+    const filledShapes: Drawable[] = [];
+    visibleFaces.forEach((face) => {
+      const points: [number, number][] = face.verts.map((i) => [
+        centeredVertices[i].x,
+        centeredVertices[i].y,
+      ]);
+      filledShapes.push(generator.polygon(points, faceFillOptions));
+    });
 
-    // 4. Right face (1-2-6-5)
-    const rightFacePoints: [number, number][] = [
-      [centeredVertices[1].x, centeredVertices[1].y],
-      [centeredVertices[2].x, centeredVertices[2].y],
-      [centeredVertices[6].x, centeredVertices[6].y],
-      [centeredVertices[5].x, centeredVertices[5].y],
-    ];
-    const rightFace = generator.polygon(rightFacePoints, faceFillOptions);
-
-    // 5. Top face (4-5-6-7)
-    const topFacePoints: [number, number][] = [
-      [centeredVertices[4].x, centeredVertices[4].y],
-      [centeredVertices[5].x, centeredVertices[5].y],
-      [centeredVertices[6].x, centeredVertices[6].y],
-      [centeredVertices[7].x, centeredVertices[7].y],
-    ];
-    const topFace = generator.polygon(topFacePoints, faceFillOptions);
-
-    // 6. Bottom face (0-3-2-1)
-    const bottomFacePoints: [number, number][] = [
-      [centeredVertices[0].x, centeredVertices[0].y],
-      [centeredVertices[3].x, centeredVertices[3].y],
-      [centeredVertices[2].x, centeredVertices[2].y],
-      [centeredVertices[1].x, centeredVertices[1].y],
-    ];
-    const bottomFace = generator.polygon(bottomFacePoints, faceFillOptions);
-
-    // Add all 6 faces at the beginning so they render behind the edges
-    // Order: back to front (painter's algorithm)
-    shapes.unshift(backFace);
-    shapes.unshift(bottomFace);
-    shapes.unshift(leftFace);
-    shapes.unshift(rightFace);
-    shapes.unshift(frontFace);
-    shapes.unshift(topFace);
+    // Prepend filled faces (render behind edges)
+    shapes.unshift(...filledShapes);
   }
 
   return shapes;

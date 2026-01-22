@@ -258,11 +258,9 @@ const adjust3DDepth = (
     return;
   }
 
-  // Isometric constants
+  // Isometric projection constants (must match shape.ts)
   const cos30 = Math.sqrt(3) / 2;
   const sin30 = 0.5;
-  const xScale = cos30;
-  const yScale = sin30;
 
   // Get original depth from customData
   const origShape3d = (origElement as any).customData?.shape3d || {
@@ -275,8 +273,7 @@ const adjust3DDepth = (
   };
   const rawOrigDepth = origShape3d.depth;
 
-  // Calculate where the original depth handle (v6 vertex) was positioned
-  // MUST match calculation from shape.ts and transformHandles.ts EXACTLY
+  // Calculate original depth handle position (must match transformHandles.ts)
   const w = origElement.width;
   const h = origElement.height;
   const [x1, y1] = getElementAbsoluteCoords(
@@ -284,79 +281,30 @@ const adjust3DDepth = (
     scene.getNonDeletedElementsMap(),
   );
 
-  // Calculate effective depth (MUST match shape.ts EXACTLY)
-  const maxPossibleDepthFromWidth = w / xScale;
-  const maxPossibleDepthFromHeight = h / yScale;
-  const maxPossibleDepth = Math.min(
-    maxPossibleDepthFromWidth,
-    maxPossibleDepthFromHeight,
-  );
+  // Calculate maximum depth and clamp (must match shape.ts)
+  const maxDepth = Math.min(w / cos30, h / sin30);
+  const origDepth = Math.max(-maxDepth, Math.min(maxDepth, rawOrigDepth));
 
-  // Clamp depth to reasonable range (can be positive or negative)
-  const maxAllowedDepth = maxPossibleDepth * 0.8;
-  const effectiveDepth = Math.max(
-    -maxAllowedDepth,
-    Math.min(maxAllowedDepth, rawOrigDepth),
-  );
-
-  // The effective depth is what was ACTUALLY rendered, so use it as the starting point
-  const origDepth = effectiveDepth;
-
-  const depthOffsetX = Math.abs(effectiveDepth) * xScale;
-  const depthOffsetY = Math.abs(effectiveDepth) * yScale;
-
-  // Calculate face dimensions (same as shape.ts)
-  const faceWidth = w - depthOffsetX;
+  // Calculate vertical offset for handle positioning
+  const depthOffsetY = Math.abs(origDepth) * sin30;
   const faceHeight = h - depthOffsetY;
 
-  // Both cube and rectangular prism use full available space
-  const totalWidth = faceWidth + depthOffsetX;
-  const totalHeight = faceHeight + depthOffsetY;
-  const offsetX = (w - totalWidth) / 2;
-  const offsetY = (h - totalHeight) / 2;
+  // Handle Y position depends on depth direction (X is always at element left edge)
+  const origHandleY =
+    origDepth >= 0
+      ? y1 + depthOffsetY // Positive: front-left-top corner
+      : y1 + faceHeight + depthOffsetY; // Negative: front-left-bottom corner
 
-  // Original handle position (depends on depth direction - MUST match transformHandles.ts)
-  let origHandleX: number;
-  let origHandleY: number;
-
-  if (effectiveDepth >= 0) {
-    // POSITIVE DEPTH: Handle at back-right-top corner (v6)
-    origHandleX = x1 + offsetX + faceWidth + depthOffsetX;
-    origHandleY = y1 + offsetY;
-  } else {
-    // NEGATIVE DEPTH: Handle at front-left-bottom corner (v0)
-    origHandleX = x1 + offsetX;
-    origHandleY = y1 + offsetY + faceHeight + depthOffsetY;
-  }
-
-  // Calculate how far pointer moved from original handle position
-  const deltaX = pointerX - origHandleX;
+  // Calculate pointer movement from original handle position
+  // The v4 handle moves purely vertically when depth changes
   const deltaY = pointerY - origHandleY;
 
-  // Calculate depth change using PROPER ISOMETRIC PROJECTION
-  // The depth axis in isometric is at 30° angle
-  // Direction vector: (cos30, sin30) = (√3/2, 0.5)
+  // When depth increases, v4 moves down by (depth * sin30)
+  // So dragging down should increase depth: depthChange = deltaY / sin30
+  const depthChange = deltaY / sin30;
 
-  // Project the movement vector onto the isometric depth axis using dot product
-  // This gives us the component of movement along the depth axis
-  // Positive = moving in +depth direction (right+down at 30°)
-  // Negative = moving in -depth direction (left+up at 30°)
-  const depthChange = deltaX * xScale + deltaY * yScale;
-
-  // Note: xScale and yScale are already defined as cos30 and sin30
-
-  // Calculate dynamic depth limits based on element size
-  // The depth can go from negative (backward) to positive (forward)
-  // Maximum depth is limited by element size to keep shape within bounds
-  const maxForwardDepth = maxPossibleDepth * 0.8; // 80% of max possible
-  const maxBackwardDepth = -maxForwardDepth; // Can go equally backward
-
-  // Calculate new depth with dynamic limits
-  // Allows BOTH forward (positive) and backward (negative) depth
-  const newDepth = Math.max(
-    maxBackwardDepth,
-    Math.min(maxForwardDepth, origDepth + depthChange),
-  );
+  // Apply new depth within valid range
+  const newDepth = Math.max(-maxDepth, Math.min(maxDepth, origDepth + depthChange));
 
   // Update element
   scene.mutateElement(element, {

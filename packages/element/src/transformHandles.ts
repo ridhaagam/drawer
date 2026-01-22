@@ -346,58 +346,26 @@ export const getTransformHandles = (
     const shape3d = (element as any).customData?.shape3d || {};
     const depth = shape3d.depth || (element.type === "cube" ? w : w * 0.6);
 
-    // Calculate isometric offsets (MUST match shape.ts exactly)
+    // Isometric projection constants (must match shape.ts)
     const cos30 = Math.sqrt(3) / 2;
     const sin30 = 0.5;
-    const xScale = cos30;
-    const yScale = sin30;
 
-    // Calculate effective depth (MUST match shape.ts exactly)
-    const maxPossibleDepthFromWidth = w / xScale;
-    const maxPossibleDepthFromHeight = h / yScale;
-    const maxPossibleDepth = Math.min(
-      maxPossibleDepthFromWidth,
-      maxPossibleDepthFromHeight,
-    );
+    // Calculate maximum depth and clamp
+    const maxDepth = Math.min(w / cos30, h / sin30);
+    const effectiveDepth = Math.max(-maxDepth, Math.min(maxDepth, depth));
 
-    // Clamp depth to reasonable range (can be positive or negative)
-    const maxAllowedDepth = maxPossibleDepth * 0.8;
-    const effectiveDepth = Math.max(
-      -maxAllowedDepth,
-      Math.min(maxAllowedDepth, depth),
-    );
-
-    const depthOffsetX = Math.abs(effectiveDepth) * xScale;
-    const depthOffsetY = Math.abs(effectiveDepth) * yScale;
-
-    // Calculate face dimensions (same as shape.ts)
-    const faceWidth = w - depthOffsetX;
+    // Calculate vertical offset for handle positioning
+    const depthOffsetY = Math.abs(effectiveDepth) * sin30;
     const faceHeight = h - depthOffsetY;
 
-    // Both cube and rectangular prism use full available space
-    const totalWidth = faceWidth + depthOffsetX;
-    const totalHeight = faceHeight + depthOffsetY;
-    const offsetX = (w - totalWidth) / 2;
-    const offsetY = (h - totalHeight) / 2;
-
-    // Position depth handle based on depth direction (MUST match shape.ts logic)
-    let depthHandleX: number;
-    let depthHandleY: number;
-
-    if (effectiveDepth >= 0) {
-      // POSITIVE DEPTH (forward): Handle at back-right-top corner (v6)
-      // v6 = front-top-right (v2) + depth offset
-      depthHandleX = x1 + offsetX + faceWidth + depthOffsetX;
-      depthHandleY = y1 + offsetY;
-    } else {
-      // NEGATIVE DEPTH (backward): Handle at front-left-bottom corner (v0 in negative mode)
-      // In negative depth, v0 becomes the visible corner where depth would extend
-      depthHandleX = x1 + offsetX;
-      depthHandleY = y1 + offsetY + faceHeight + depthOffsetY;
-    }
+    // Handle Y position depends on depth direction (X is always at element left edge)
+    const depthHandleY =
+      effectiveDepth >= 0
+        ? y1 + depthOffsetY // Positive: front-left-top corner
+        : y1 + faceHeight + depthOffsetY; // Negative: front-left-bottom corner
 
     handles.depth = generateTransformHandle(
-      depthHandleX - handleWidth / 2,
+      x1 - handleWidth / 2,
       depthHandleY - handleHeight / 2,
       handleWidth,
       handleHeight,
