@@ -730,25 +730,6 @@ const generate3DRectangularShapes = (
 
   const centeredVertices = [v0, v1, v2, v3, v4, v5, v6, v7];
 
-  // Verify all vertices are within bounds (for debugging)
-  const allWithinBounds = centeredVertices.every(
-    (v) => v.x >= 0 && v.x <= w && v.y >= 0 && v.y <= h,
-  );
-  if (!allWithinBounds) {
-    console.warn("⚠️ Some vertices outside bounds!", {
-      w,
-      h,
-      effectiveDepth,
-      vertices: centeredVertices,
-      bounds: {
-        minX: Math.min(...centeredVertices.map((v) => v.x)),
-        maxX: Math.max(...centeredVertices.map((v) => v.x)),
-        minY: Math.min(...centeredVertices.map((v) => v.y)),
-        maxY: Math.max(...centeredVertices.map((v) => v.y)),
-      },
-    });
-  }
-
   // Helper: Calculate 2D cross product to determine face winding
   // In screen coordinates (Y-down), negative = counter-clockwise (front-facing)
   const calculate2DCrossProduct = (
