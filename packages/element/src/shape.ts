@@ -749,6 +749,62 @@ const generate3DRectangularShapes = (
     });
   }
 
+  // Helper: Calculate 2D cross product to determine face winding
+  // In screen coordinates (Y-down), negative = counter-clockwise (front-facing)
+  const calculate2DCrossProduct = (
+    v0: { x: number; y: number },
+    v1: { x: number; y: number },
+    v2: { x: number; y: number },
+  ): number => {
+    const ax = v1.x - v0.x;
+    const ay = v1.y - v0.y;
+    const bx = v2.x - v0.x;
+    const by = v2.y - v0.y;
+    return ax * by - ay * bx;
+  };
+
+  // Define 6 faces with vertex indices (counter-clockwise when looking from outside)
+  const faceDefinitions = [
+    [0, 1, 5, 4], // Front face
+    [3, 7, 6, 2], // Back face
+    [0, 4, 7, 3], // Left face
+    [1, 2, 6, 5], // Right face
+    [4, 5, 6, 7], // Top face
+    [0, 3, 2, 1], // Bottom face
+  ];
+
+  // Map each edge to its adjacent faces
+  const edgeToFaces = new Map<string, number[]>();
+  faceDefinitions.forEach((faceVerts, faceIdx) => {
+    for (let i = 0; i < faceVerts.length; i++) {
+      const v1 = faceVerts[i];
+      const v2 = faceVerts[(i + 1) % faceVerts.length];
+      const edgeKey = `${Math.min(v1, v2)},${Math.max(v1, v2)}`;
+      if (!edgeToFaces.has(edgeKey)) {
+        edgeToFaces.set(edgeKey, []);
+      }
+      edgeToFaces.get(edgeKey)!.push(faceIdx);
+    }
+  });
+
+  // Determine which faces are visible using 2D cross product
+  // In screen coordinates (Y increases downward), negative cross product = front-facing
+  const faceVisibility = faceDefinitions.map((faceVerts) => {
+    const v0 = centeredVertices[faceVerts[0]];
+    const v1 = centeredVertices[faceVerts[1]];
+    const v2 = centeredVertices[faceVerts[2]];
+    const crossProduct = calculate2DCrossProduct(v0, v1, v2);
+    // Negative cross product = counter-clockwise in screen coords = front-facing
+    return crossProduct < 0;
+  });
+
+  // Check if edge should be visible (at least one adjacent face is visible)
+  const isEdgeVisible = (startIdx: number, endIdx: number): boolean => {
+    const edgeKey = `${Math.min(startIdx, endIdx)},${Math.max(startIdx, endIdx)}`;
+    const adjacentFaces = edgeToFaces.get(edgeKey) || [];
+    return adjacentFaces.some((faceIdx) => faceVisibility[faceIdx]);
+  };
+
   // Define all 12 edges
   const edges: [number, number][] = [
     // Bottom face
@@ -851,31 +907,62 @@ const generate3DRectangularShapes = (
       `;
     };
 
-    // Draw rounded edges for visible faces
+    // Draw rounded edges for VISIBLE faces only
     const v = centeredVertices;
 
-    // Front face outline (0-1-5-4)
-    shapes.push(
-      generator.path(createRoundedFacePath(v[0], v[1], v[5], v[4]), options),
-    );
+    // Face indices: 0=front, 1=back, 2=left, 3=right, 4=top, 5=bottom
+    // Only draw faces that are front-facing
+    if (faceVisibility[0]) {
+      // Front face (0-1-5-4)
+      shapes.push(
+        generator.path(createRoundedFacePath(v[0], v[1], v[5], v[4]), options),
+      );
+    }
 
-    // Top face outline (4-5-6-7)
-    shapes.push(
-      generator.path(createRoundedFacePath(v[4], v[5], v[6], v[7]), options),
-    );
+    if (faceVisibility[4]) {
+      // Top face (4-5-6-7)
+      shapes.push(
+        generator.path(createRoundedFacePath(v[4], v[5], v[6], v[7]), options),
+      );
+    }
 
-    // Right face outline (1-2-6-5)
-    shapes.push(
-      generator.path(createRoundedFacePath(v[1], v[2], v[6], v[5]), options),
-    );
+    if (faceVisibility[3]) {
+      // Right face (1-2-6-5)
+      shapes.push(
+        generator.path(createRoundedFacePath(v[1], v[2], v[6], v[5]), options),
+      );
+    }
+
+    // Also draw back-facing faces that become visible with negative depth
+    if (faceVisibility[1]) {
+      // Back face (3-7-6-2)
+      shapes.push(
+        generator.path(createRoundedFacePath(v[3], v[7], v[6], v[2]), options),
+      );
+    }
+
+    if (faceVisibility[5]) {
+      // Bottom face (0-3-2-1)
+      shapes.push(
+        generator.path(createRoundedFacePath(v[0], v[3], v[2], v[1]), options),
+      );
+    }
+
+    if (faceVisibility[2]) {
+      // Left face (0-4-7-3)
+      shapes.push(
+        generator.path(createRoundedFacePath(v[0], v[4], v[7], v[3]), options),
+      );
+    }
   } else {
-    // Draw straight edges (original code)
+    // Draw only visible edges (with back-face culling)
     edges.forEach(([startIdx, endIdx]) => {
-      const start = centeredVertices[startIdx];
-      const end = centeredVertices[endIdx];
-
-      const lineShape = generator.line(start.x, start.y, end.x, end.y, options);
-      shapes.push(lineShape);
+      if (isEdgeVisible(startIdx, endIdx)) {
+        const start = centeredVertices[startIdx];
+        const end = centeredVertices[endIdx];
+        const lineShape = generator.line(start.x, start.y, end.x, end.y, options);
+        shapes.push(lineShape);
+      }
     });
   }
 
