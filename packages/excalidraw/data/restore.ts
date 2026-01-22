@@ -405,6 +405,8 @@ export const restoreElement = (
     case "diamond":
     case "iframe":
     case "embeddable":
+    case "cube":
+    case "rectangularPrism":
       return restoreElementWithProperties(element, {});
     case "magicframe":
     case "frame":
