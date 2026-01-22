@@ -816,7 +816,7 @@ const generate3DRectangularShapes = (
     strokeWidth:
       element.strokeStyle !== "solid" ? strokeWidth + 0.5 : strokeWidth,
     stroke: element.strokeColor || "#000000",
-    roughness: element.roughness || 1,
+    roughness: adjustRoughness(element as ExcalidrawElement),
     strokeLineDash:
       element.strokeStyle === "dashed"
         ? getDashArrayDashed(strokeWidth)
@@ -936,7 +936,7 @@ const generate3DRectangularShapes = (
   if (element.backgroundColor && !isTransparent(element.backgroundColor)) {
     const faceFillOptions = {
       seed: element.seed,
-      roughness: element.roughness || 1,
+      roughness: adjustRoughness(element as ExcalidrawElement),
       fill: element.backgroundColor,
       fillStyle: element.fillStyle || "solid",
       fillWeight: strokeWidth / 2,
