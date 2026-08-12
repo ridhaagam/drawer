@@ -43,4 +43,4 @@ There is no PDF export. `svg2pdf` needs TTF to embed text and this repo ships wo
 
 Every item spells out its own stroke, fill, roughness and font rather than inheriting the defaults, so the kit keeps looking the same even if the editor defaults change later. The colours come from the same colourblind-safe set as the quick picks, so items dropped from the kit match shapes drawn by hand.
 
-The tensor cube sets its depth to 0.3 of its width. A cube's default depth equals its width, and because the solid is fitted inside the element's box that projects to a flat slab rather than a cube; roughly a third is what actually reads as one. Worth knowing if you draw cubes by hand and wonder why they look flat: drag the depth handle down, or set 3D depth in the properties panel.
+Cubes extrude to 0.3 of their width. The solid is fitted inside the element's box, so a cube whose depth equalled its width -- the old default -- projected to a flat plate seen edge-on rather than to a cube. Adjust any individual shape with the depth handle, or with 3D depth in the properties panel; a saved drawing keeps whatever depth it was stored with.
