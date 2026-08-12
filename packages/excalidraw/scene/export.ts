@@ -17,6 +17,8 @@ import {
 
 import { round } from "@excalidraw/math";
 
+import { preloadSceneMath } from "@excalidraw/element";
+
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
@@ -241,6 +243,8 @@ export const exportToCanvas = async (
     ),
     files,
   });
+
+  await preloadSceneMath(elementsForRender);
 
   renderStaticScene({
     canvas,
@@ -483,6 +487,8 @@ export const exportToSvg = async (
   const rsvg = rough.svg(svgRoot);
 
   const renderEmbeddables = opts?.renderEmbeddables ?? false;
+
+  await preloadSceneMath(elementsForRender);
 
   renderSceneToSvg(
     elementsForRender,

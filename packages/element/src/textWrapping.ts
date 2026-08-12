@@ -1,5 +1,6 @@
 import { isDevEnv, isTestEnv } from "@excalidraw/common";
 
+import { isMathSpan, splitPreservingMath } from "./mathText/parse";
 import { charWidth, getLineWidth } from "./textMeasurements";
 
 import type { FontString } from "./types";
@@ -362,10 +363,19 @@ const Break = {
 export const parseTokens = (line: string) => {
   const breakLineRegex = getLineBreakRegex();
 
-  // normalizing to single-codepoint composed chars due to canonical equivalence
-  // of multi-codepoint versions for chars like č, で (~ so that we don't break a line in between c and ˇ)
-  // filtering due to multi-codepoint chars like 👨‍👩‍👧‍👦, 👩🏽‍🦰
-  return line.normalize("NFC").split(breakLineRegex).filter(Boolean);
+  const tokenize = (segment: string) =>
+    // normalizing to single-codepoint composed chars due to canonical equivalence
+    // of multi-codepoint versions for chars like č, で (~ so that we don't break a line in between c and ˇ)
+    // filtering due to multi-codepoint chars like 👨‍👩‍👧‍👦, 👩🏽‍🦰
+    segment.normalize("NFC").split(breakLineRegex).filter(Boolean);
+
+  // A formula is one token. Left to the line-break regex it would be split at
+  // every brace and operator, and an over-wide one would then be broken down
+  // to single characters by wrapWord, leaving the renderer a `$...$` span it
+  // can no longer parse. An over-wide formula overflows instead.
+  return splitPreservingMath(line).flatMap((segment) =>
+    isMathSpan(segment) ? [segment] : tokenize(segment),
+  );
 };
 
 /**

@@ -4,6 +4,7 @@ import {
   MIME_TYPES,
   SVG_NS,
   getFontFamilyString,
+  getFontString,
   isRTL,
   isTestEnv,
   getVerticalOffset,
@@ -18,6 +19,7 @@ import {
 import { LinearElementEditor } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
+import { getLineStartX, hasMath, layoutMathLine } from "@excalidraw/element";
 import {
   isArrowElement,
   isIframeLikeElement,
@@ -678,19 +680,70 @@ const renderElementToSvg = (
             : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
-        for (let i = 0; i < lines.length; i++) {
+        const font = getFontString(element);
+
+        const addTextNode = (
+          value: string,
+          x: number,
+          y: number,
+          anchor: string,
+        ) => {
           const text = svgRoot.ownerDocument!.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
-          text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
+          text.textContent = value;
+          text.setAttribute("x", `${x}`);
+          text.setAttribute("y", `${y}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute("fill", element.strokeColor);
-          text.setAttribute("text-anchor", textAnchor);
+          text.setAttribute("text-anchor", anchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
           text.setAttribute("dominant-baseline", "alphabetic");
           node.appendChild(text);
+        };
+
+        for (let i = 0; i < lines.length; i++) {
+          const baselineY = i * lineHeightPx + verticalOffset;
+
+          if (!hasMath(lines[i])) {
+            addTextNode(lines[i], horizontalOffset, baselineY, textAnchor);
+            continue;
+          }
+
+          // Math is laid out from a concrete left edge rather than an anchor,
+          // so the runs stay adjacent whatever the alignment.
+          const layout = layoutMathLine(lines[i], font, element.fontSize);
+          const startX = getLineStartX(
+            element.textAlign,
+            element.width,
+            layout.width,
+          );
+
+          for (const run of layout.runs) {
+            if (run.type !== "math") {
+              addTextNode(run.value, startX + run.x, baselineY, "start");
+              continue;
+            }
+
+            const group = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+            group.setAttribute(
+              "transform",
+              `translate(${startX + run.x} ${baselineY - run.math.baseline})`,
+            );
+            // MathJax emits currentColor, so the glyphs inherit the element's
+            // stroke from here rather than being baked per colour
+            group.setAttribute("color", element.strokeColor);
+            group.innerHTML = run.math.svg;
+
+            const inner = group.firstElementChild;
+            if (inner) {
+              inner.setAttribute("width", `${run.math.width}`);
+              inner.setAttribute("height", `${run.math.height}`);
+              inner.removeAttribute("style");
+            }
+
+            node.appendChild(group);
+          }
         }
 
         const g = maybeWrapNodesInFrameClipPath(

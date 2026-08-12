@@ -118,3 +118,6 @@ export * from "./transformHandles";
 export * from "./typeChecks";
 export * from "./utils";
 export * from "./zindex";
+export * from "./mathText/parse";
+export * from "./mathText/layout";
+export * from "./mathText/render";

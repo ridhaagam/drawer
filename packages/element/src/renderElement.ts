@@ -63,6 +63,9 @@ import {
   isMagicFrameElement,
   isImageElement,
 } from "./typeChecks";
+import { getLineStartX, layoutMathLine } from "./mathText/layout";
+import { hasMath } from "./mathText/parse";
+
 import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
 
@@ -546,12 +549,41 @@ const drawElementOnCanvas = (
           lineHeightPx,
         );
 
+        const font = getFontString(element);
+
         for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            index * lineHeightPx + verticalOffset,
+          const baselineY = index * lineHeightPx + verticalOffset;
+
+          if (!hasMath(lines[index])) {
+            context.fillText(lines[index], horizontalOffset, baselineY);
+            continue;
+          }
+
+          const layout = layoutMathLine(lines[index], font, element.fontSize);
+          const startX = getLineStartX(
+            element.textAlign,
+            element.width,
+            layout.width,
           );
+
+          context.save();
+          context.textAlign = "left";
+
+          for (const run of layout.runs) {
+            if (run.type === "math" && run.math.image) {
+              context.drawImage(
+                run.math.image,
+                startX + run.x,
+                baselineY - run.math.baseline,
+                run.math.width,
+                run.math.height,
+              );
+            } else {
+              context.fillText(run.value, startX + run.x, baselineY);
+            }
+          }
+
+          context.restore();
         }
         context.restore();
         if (shouldTemporarilyAttach) {

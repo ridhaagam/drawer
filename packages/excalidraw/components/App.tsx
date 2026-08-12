@@ -175,6 +175,9 @@ import {
   getContainerElement,
   isValidTextContainer,
   redrawTextBoundingBox,
+  ensureMath,
+  hasMath,
+  parseMathRuns,
   hasBoundingBox,
   getFrameChildren,
   isCursorInFrame,
@@ -2971,6 +2974,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.scheduleImageRefresh();
+    this.scheduleMathRefresh();
   };
 
   private onScroll = debounce(() => {
@@ -10419,6 +10423,53 @@ class App extends React.Component<AppProps, AppState> {
       if (updatedFiles.size) {
         this.scene.triggerUpdate();
       }
+    }
+  };
+
+  /** MathJax is loaded on demand, so a label containing a formula renders as
+   *  its source for the first frame. This schedules the render and repaints
+   *  once it lands, mirroring how images resolve. */
+  private getMathTextElements = () => {
+    const found: ExcalidrawTextElement[] = [];
+    for (const element of this.scene.getNonDeletedElements()) {
+      if (isTextElement(element) && hasMath(element.text)) {
+        found.push(element);
+      }
+    }
+    return found;
+  };
+
+  private scheduleMathRefresh = () => {
+    for (const element of this.getMathTextElements()) {
+      for (const line of element.text.split("\n")) {
+        for (const run of parseMathRuns(line)) {
+          if (run.type === "math") {
+            ensureMath(run.value, element.fontSize, this.onMathRendered);
+          }
+        }
+      }
+    }
+  };
+
+  private onMathRendered = () => {
+    const mathElements = this.getMathTextElements();
+
+    for (const element of mathElements) {
+      ShapeCache.delete(element);
+      // the rendered formula is a different width than the source text that
+      // stood in for it, so the box has to be remeasured
+      redrawTextBoundingBox(
+        element,
+        getContainerElement(
+          element,
+          this.scene.getElementsMapIncludingDeleted(),
+        ),
+        this.scene,
+      );
+    }
+
+    if (mathElements.length) {
+      this.scene.triggerUpdate();
     }
   };
 

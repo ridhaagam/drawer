@@ -7,6 +7,9 @@ import {
   normalizeEOL,
 } from "@excalidraw/common";
 
+import { hasMath, parseMathRuns } from "./mathText/parse";
+import { getRenderedMath } from "./mathText/render";
+
 import type { FontString, ExcalidrawTextElement } from "./types";
 
 export const measureText = (
@@ -149,12 +152,31 @@ class CanvasTextMetricsProvider implements TextMetricsProvider {
   }
 }
 
-export const getLineWidth = (text: string, font: FontString) => {
+const measureRuns = (text: string, font: FontString) => {
   if (!textMetricsProvider) {
     textMetricsProvider = new CanvasTextMetricsProvider();
   }
 
   return textMetricsProvider.getLineWidth(text, font);
+};
+
+export const getLineWidth = (text: string, font: FontString) => {
+  if (!hasMath(text)) {
+    return measureRuns(text, font);
+  }
+
+  // A formula's width comes from MathJax, not from measuring its source. Until
+  // MathJax has loaded there is no rendered box to measure, so the source text
+  // stands in and the line is remeasured once it resolves.
+  const fontSize = parseFloat(font);
+
+  return parseMathRuns(text).reduce((width, run) => {
+    if (run.type === "text") {
+      return width + measureRuns(run.value, font);
+    }
+    const rendered = getRenderedMath(run.value, fontSize);
+    return width + (rendered ? rendered.width : measureRuns(run.value, font));
+  }, 0);
 };
 
 export const getTextWidth = (text: string, font: FontString) => {
