@@ -70,6 +70,7 @@ import {
   FileManager,
   updateStaleImageStatuses,
 } from "../data/FileManager";
+import { rememberBoard } from "../data/boards";
 import { LocalData } from "../data/LocalData";
 import {
   isSavedToServer,
@@ -979,6 +980,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   setActiveRoomLink = (activeRoomLink: string | null) => {
     this.setState({ activeRoomLink });
     appJotaiStore.set(activeRoomLinkAtom, activeRoomLink);
+
+    // both creating and joining a room funnel through here, so this is the one
+    // place that sees every board the user has actually opened
+    if (activeRoomLink && this.portal.roomId) {
+      rememberBoard(this.portal.roomId, activeRoomLink);
+    }
   };
 
   getActiveRoomLink = () => this.state.activeRoomLink;

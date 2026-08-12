@@ -1,6 +1,10 @@
-# Known-failing tests
+# Test baseline
 
-These five tests fail on a clean checkout and have done since `0a53f8d`, the first commit of this fork. They are inherited from however the fork was created, not caused by any feature work here. Verified by checking out `0a53f8d` with a clean working tree and running them in isolation.
+The suite is fully green. `yarn test:app --watch=false` should report zero failures; any failure is a regression.
+
+## The five tests that used to fail
+
+Since `0a53f8d`, the fork's first commit, these five failed on a clean checkout:
 
 ```
 excalidraw-app/tests/collab.test.tsx        > should allow to undo / redo even on force-deleted elements
@@ -10,8 +14,20 @@ excalidraw-app/tests/MobileMenu.test.tsx    > should initialize with welcome scr
 excalidraw-app/tests/MobileMenu.test.tsx    > should set editor interface correctly
 ```
 
-`LanguageList` fails with `Missing Provider from createIsolation` out of `jotai-scope`, preceded by `Cannot read properties of null (reading 'useState')`. That is a test-harness setup problem rather than product code, and it is the likely shared cause of the `MobileMenu` pair.
+The cause was two copies of React. The root pinned `19.2.0` and `excalidraw-app` pinned `19.0.0`, so yarn hoisted the root copy and gave the app a nested one. Components from `packages/excalidraw` then resolved a different React instance than components from `excalidraw-app`, which leaves the hooks dispatcher null: `Cannot read properties of null (reading 'useState')`, followed by `Missing Provider from createIsolation` as jotai-scope fell over behind it.
 
-The pass gate for a change is therefore **exactly these five and no more**, not a green suite. Any sixth failure is a regression.
+Aligning `excalidraw-app` to `19.2.0` collapses it back to one hoisted copy and all five pass.
 
-This matters most when replacing `excalidraw-app/data/firebase.ts`, since `collab.test.tsx` mocks that module by path and two of its tests are already red — "my change broke it" and "it was already broken" are otherwise indistinguishable there.
+Worth remembering, because the symptom points nowhere near the cause: if hooks start throwing on null in a test that renders app-level components, check for a second React before anything else.
+
+```bash
+ls excalidraw-app/node_modules/react   # should not exist
+```
+
+## Tests that skip rather than fail
+
+`excalidraw-app/tests/persistence.e2e.test.ts` drives the real HTTP contract against a running `excalidraw-server` and skips itself when none is reachable. To actually run it, start the stack first:
+
+```bash
+yarn dev:selfhost
+```

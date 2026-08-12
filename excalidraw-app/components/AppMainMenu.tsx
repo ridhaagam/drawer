@@ -2,6 +2,7 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  LibraryIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
@@ -19,6 +20,7 @@ export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
   isCollaborating: boolean;
   isCollabEnabled: boolean;
+  onBoardsDialogOpen: () => any;
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
@@ -34,6 +36,11 @@ export const AppMainMenu: React.FC<{
           isCollaborating={props.isCollaborating}
           onSelect={() => props.onCollabDialogOpen()}
         />
+      )}
+      {props.isCollabEnabled && (
+        <MainMenu.Item icon={LibraryIcon} onClick={props.onBoardsDialogOpen}>
+          Boards
+        </MainMenu.Item>
       )}
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
       <MainMenu.DefaultItems.SearchMenu />
