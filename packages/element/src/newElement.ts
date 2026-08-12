@@ -1,4 +1,6 @@
 import {
+  DEFAULT_3D_DEPTH,
+  DEFAULT_3D_PERSPECTIVE,
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -10,6 +12,7 @@ import {
   getFontString,
   getUpdatedTimestamp,
   getLineHeight,
+  PRISM_DEPTH_RATIO,
 } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";
@@ -216,9 +219,6 @@ export const newMagicFrameElement = (
   return frameElement;
 };
 
-/**
- * Create a new 3D cube element with default 3D properties
- */
 export const newCubeElement = (
   opts: ElementConstructorOpts & {
     rotationX?: number;
@@ -233,12 +233,11 @@ export const newCubeElement = (
     rotationY = 0,
     rotationZ = 0,
     depth,
-    perspective = 500,
+    perspective = DEFAULT_3D_PERSPECTIVE,
     ...baseOpts
   } = opts;
 
-  // For cubes, depth should equal width for uniform dimensions
-  const actualDepth = depth !== undefined ? depth : baseOpts.width || 100;
+  const actualDepth = depth ?? baseOpts.width ?? DEFAULT_3D_DEPTH;
 
   return _newElementBase<any>("cube", {
     ...baseOpts,
@@ -255,9 +254,6 @@ export const newCubeElement = (
   });
 };
 
-/**
- * Create a new 3D rectangular prism element with default 3D properties
- */
 export const newRectangularPrismElement = (
   opts: ElementConstructorOpts & {
     rotationX?: number;
@@ -272,13 +268,12 @@ export const newRectangularPrismElement = (
     rotationY = 0,
     rotationZ = 0,
     depth,
-    perspective = 500,
+    perspective = DEFAULT_3D_PERSPECTIVE,
     ...baseOpts
   } = opts;
 
-  // For rectangular prisms, depth can be different from width/height
   const actualDepth =
-    depth !== undefined ? depth : (baseOpts.width || 100) * 0.6;
+    depth ?? (baseOpts.width ?? DEFAULT_3D_DEPTH) * PRISM_DEPTH_RATIO;
 
   return _newElementBase<any>("rectangularPrism", {
     ...baseOpts,

@@ -369,6 +369,14 @@ export const ELEMENT_READY_TO_ERASE_OPACITY = 20;
 export const DEFAULT_PROPORTIONAL_RADIUS = 0.25;
 // Fixed radius for the ADAPTIVE_RADIUS algorithm. In pixels.
 export const DEFAULT_ADAPTIVE_RADIUS = 32;
+// Upper bound of the manual edge-roundness slider. In pixels.
+export const MAX_EDGE_ROUNDNESS = 50;
+// Extrusion depth of a newly created 3D shape, and the slider bounds. In pixels.
+export const DEFAULT_3D_DEPTH = 100;
+export const MAX_3D_DEPTH = 500;
+export const DEFAULT_3D_PERSPECTIVE = 500;
+// A rectangular prism extrudes shallower than a cube, as a fraction of its width.
+export const PRISM_DEPTH_RATIO = 0.6;
 // roundness type (algorithm)
 export const ROUNDNESS = {
   // Used for legacy rounding (rectangles), which currently works the same

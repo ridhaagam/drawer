@@ -1,5 +1,216 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`exportToSvg > with 3D shapes 1`] = `
+<svg
+  height="120"
+  version="1.1"
+  viewBox="0 0 320 120"
+  width="320"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- svg-source:excalidraw -->
+  <metadata />
+  <defs>
+    <style
+      class="style-fonts"
+    >
+      
+      
+    </style>
+  </defs>
+  <g
+    data-id="id0"
+    stroke-linecap="round"
+  >
+    <g
+      transform="translate(10 10) rotate(0 50 50)"
+    >
+      <path
+        d="M0.57 100.65 C2.47 100.75, 4.98 98.81, 12.87 100.26 M-0.43 100.18 C3.26 100.49, 5.99 100.11, 13.01 100.5"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(10 10) rotate(0 50 50)"
+    >
+      <path
+        d="M14.25 100.96 C30.81 90.99, 47.89 78.09, 99.21 50.39 M12.75 100.26 C33.12 89.37, 51.94 77.73, 99.42 50.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(10 10) rotate(0 50 50)"
+    >
+      <path
+        d="M0.57 50.65 C2.47 50.75, 4.98 48.81, 12.87 50.26 M-0.43 50.18 C3.26 50.49, 5.99 50.11, 13.01 50.5"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(10 10) rotate(0 50 50)"
+    >
+      <path
+        d="M14.25 50.96 C30.81 40.99, 47.89 28.09, 99.21 0.39 M12.75 50.26 C33.12 39.37, 51.94 27.73, 99.42 0.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(10 10) rotate(0 50 50)"
+    >
+      <path
+        d="M100.57 0.65 C97.11 0.81, 94.27 -1.13, 86.07 0.26 M99.57 0.18 C97.33 0.6, 94.13 0.22, 86.21 0.5"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(10 10) rotate(0 50 50)"
+    >
+      <path
+        d="M87.46 0.96 C68.55 11.34, 50.99 18.45, -0.79 50.39 M85.95 0.26 C67.76 12.26, 48.24 22.75, -0.58 50.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(10 10) rotate(0 50 50)"
+    >
+      <path
+        d="M0.86 100.96 C0.1 91.16, -0.15 78.27, -0.79 50.39 M-0.65 100.26 C0.55 89.75, 0.2 78.11, -0.58 50.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(10 10) rotate(0 50 50)"
+    >
+      <path
+        d="M14.25 100.96 C13.49 91.16, 13.25 78.27, 12.6 50.39 M12.75 100.26 C13.95 89.75, 13.6 78.11, 12.82 50.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(10 10) rotate(0 50 50)"
+    >
+      <path
+        d="M100.86 50.96 C100.1 41.16, 99.85 28.27, 99.21 0.39 M99.35 50.26 C100.55 39.75, 100.2 28.11, 99.42 0.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+  </g>
+  <g
+    data-id="id1"
+    stroke-linecap="round"
+  >
+    <g
+      transform="translate(210 10) rotate(0 50 50)"
+    >
+      <path
+        d="M0.86 100.96 C9.29 101.07, 18.66 98.17, 47.24 100.39 M-0.65 100.26 C11.07 100.61, 21.35 100.04, 47.46 100.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(210 10) rotate(0 50 50)"
+    >
+      <path
+        d="M48.9 100.96 C58.36 95.06, 68.51 86.16, 99.21 70.39 M47.39 100.26 C60.05 93.95, 71.2 86.74, 99.42 70.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(210 10) rotate(0 50 50)"
+    >
+      <path
+        d="M0.86 30.96 C9.29 31.07, 18.66 28.17, 47.24 30.39 M-0.65 30.26 C11.07 30.61, 21.35 30.04, 47.46 30.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(210 10) rotate(0 50 50)"
+    >
+      <path
+        d="M48.9 30.96 C58.36 25.06, 68.51 16.16, 99.21 0.39 M47.39 30.26 C60.05 23.95, 71.2 16.74, 99.42 0.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(210 10) rotate(0 50 50)"
+    >
+      <path
+        d="M100.86 0.96 C90.07 1.26, 80.22 -1.63, 51.17 0.39 M99.35 0.26 C89.81 1.02, 78.82 0.45, 51.38 0.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(210 10) rotate(0 50 50)"
+    >
+      <path
+        d="M52.82 0.96 C41 7.27, 30.37 10.38, -0.79 30.39 M51.31 0.26 C40.83 7.68, 28.98 13.75, -0.58 30.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(210 10) rotate(0 50 50)"
+    >
+      <path
+        d="M0.86 100.96 C0.26 87.16, 0.02 70.27, -0.79 30.39 M-0.65 100.26 C0.6 85.32, 0.25 69.25, -0.58 30.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(210 10) rotate(0 50 50)"
+    >
+      <path
+        d="M48.9 100.96 C48.3 87.16, 48.06 70.27, 47.24 30.39 M47.39 100.26 C48.64 85.32, 48.28 69.25, 47.46 30.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+    <g
+      transform="translate(210 10) rotate(0 50 50)"
+    >
+      <path
+        d="M100.86 70.96 C100.26 57.16, 100.02 40.27, 99.21 0.39 M99.35 70.26 C100.6 55.32, 100.25 39.25, 99.42 0.75"
+        fill="none"
+        stroke="#1e1e1e"
+        stroke-width="2"
+      />
+    </g>
+  </g>
+</svg>
+`;
+
 exports[`exportToSvg > with a CJK font 1`] = `
 <svg
   height="120"

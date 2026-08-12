@@ -87,6 +87,34 @@ describe("exportToSvg", () => {
     // extend the timeout, as it needs to first load the fonts from disk and then perform whole woff2 decode, subset and encode (without workers)
   }, 30_000);
 
+  it("with 3D shapes", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      [
+        API.createElement({
+          type: "cube",
+          x: 0,
+          y: 0,
+          width: ELEMENT_WIDTH,
+          height: ELEMENT_HEIGHT,
+          index: "a0" as FractionalIndex,
+        }),
+        API.createElement({
+          type: "rectangularPrism",
+          x: 200,
+          y: 0,
+          width: ELEMENT_WIDTH,
+          height: ELEMENT_HEIGHT,
+          index: "a1" as FractionalIndex,
+        }),
+      ],
+      DEFAULT_OPTIONS,
+      null,
+    );
+
+    expect(svgElement.querySelectorAll("path").length).toBeGreaterThan(0);
+    expect(svgElement).toMatchSnapshot();
+  });
+
   it("with background color", async () => {
     const BACKGROUND_COLOR = "#abcdef";
 

@@ -1,6 +1,7 @@
 import {
   COLOR_PALETTE,
   ARROW_TYPE,
+  DEFAULT_3D_DEPTH,
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -38,6 +39,8 @@ export const getDefaultAppState = (): Omit<
     currentItemStartArrowhead: null,
     currentItemStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
     currentItemRoundness: isTestEnv() ? "sharp" : "round",
+    currentItemEdgeRoundness: 0,
+    currentItem3DDepth: DEFAULT_3D_DEPTH,
     currentItemArrowType: ARROW_TYPE.round,
     currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
     currentItemStrokeWidth: DEFAULT_ELEMENT_PROPS.strokeWidth,
@@ -163,6 +166,8 @@ const APP_STATE_STORAGE_CONF = (<
     export: false,
     server: false,
   },
+  currentItemEdgeRoundness: { browser: true, export: false, server: false },
+  currentItem3DDepth: { browser: true, export: false, server: false },
   currentItemArrowType: {
     browser: true,
     export: false,

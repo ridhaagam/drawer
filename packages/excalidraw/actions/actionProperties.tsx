@@ -7,9 +7,12 @@ import {
   DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
   DEFAULT_ELEMENT_STROKE_PICKS,
   ARROW_TYPE,
+  DEFAULT_3D_DEPTH,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
+  MAX_3D_DEPTH,
+  MAX_EDGE_ROUNDNESS,
   ROUNDNESS,
   STROKE_WIDTH,
   VERTICAL_ALIGN,
@@ -40,6 +43,8 @@ import {
 } from "@excalidraw/element";
 
 import {
+  is3DElement,
+  is3DElementType,
   isArrowElement,
   isBoundToContainer,
   isElbowArrow,
@@ -596,7 +601,7 @@ export const actionChange3DDepth = register({
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) => {
-        if (el.type === "cube" || el.type === "rectangularPrism") {
+        if (is3DElement(el)) {
           const existingShape3d = el.customData?.shape3d || {
             rotationX: 0,
             rotationY: 0,
@@ -626,17 +631,25 @@ export const actionChange3DDepth = register({
       appState,
     );
 
-    const has3DElements = targetElements.some(
-      (el) => el.type === "cube" || el.type === "rectangularPrism",
-    );
-
     if (
-      !has3DElements &&
-      appState.activeTool.type !== "cube" &&
-      appState.activeTool.type !== "rectangularPrism"
+      !targetElements.some(is3DElement) &&
+      !is3DElementType(appState.activeTool.type)
     ) {
       return null;
     }
+
+    const depth =
+      getFormValue(
+        elements,
+        app,
+        (element) =>
+          is3DElement(element)
+            ? element.customData?.shape3d?.depth ?? element.width
+            : null,
+        is3DElement,
+        (hasSelection) =>
+          hasSelection ? null : appState.currentItem3DDepth ?? DEFAULT_3D_DEPTH,
+      ) ?? DEFAULT_3D_DEPTH;
 
     return (
       <fieldset>
@@ -644,63 +657,15 @@ export const actionChange3DDepth = register({
         <div className="buttonList">
           <input
             type="range"
-            min="-500"
-            max="500"
+            min={-MAX_3D_DEPTH}
+            max={MAX_3D_DEPTH}
             step="10"
-            value={
-              getFormValue(
-                elements,
-                app,
-                (element) => {
-                  if (
-                    element.type === "cube" ||
-                    element.type === "rectangularPrism"
-                  ) {
-                    return element.customData?.shape3d?.depth || element.width;
-                  }
-                  return null;
-                },
-                (element) =>
-                  element.type === "cube" ||
-                  element.type === "rectangularPrism",
-                (hasSelection) =>
-                  hasSelection
-                    ? null
-                    : (appState as any).currentItem3DDepth || 100,
-              ) || 100
-            }
+            value={depth}
             onChange={(event) => updateData(+event.target.value)}
             style={{ width: "100%" }}
           />
-          <div
-            style={{ textAlign: "center", fontSize: "12px", marginTop: "4px" }}
-          >
-            {(() => {
-              const depth =
-                getFormValue(
-                  elements,
-                  app,
-                  (element) => {
-                    if (
-                      element.type === "cube" ||
-                      element.type === "rectangularPrism"
-                    ) {
-                      return (
-                        element.customData?.shape3d?.depth || element.width
-                      );
-                    }
-                    return null;
-                  },
-                  (element) =>
-                    element.type === "cube" ||
-                    element.type === "rectangularPrism",
-                  (hasSelection) =>
-                    hasSelection
-                      ? null
-                      : (appState as any).currentItem3DDepth || 100,
-                ) || 100;
-              return depth >= 0 ? `+${depth}px` : `${depth}px`;
-            })()}
+          <div className="rangeValueLabel">
+            {depth >= 0 ? `+${depth}px` : `${depth}px`}
           </div>
         </div>
       </fieldset>
@@ -741,16 +706,25 @@ export const actionChangeEdgeRoundness = register({
       appState,
     );
 
-    const hasRoundableElements = targetElements.some((el) =>
-      canChangeRoundness(el.type),
-    );
-
     if (
-      !hasRoundableElements &&
+      !targetElements.some((el) => canChangeRoundness(el.type)) &&
       !canChangeRoundness(appState.activeTool.type)
     ) {
       return null;
     }
+
+    const roundness =
+      getFormValue(
+        elements,
+        app,
+        (element) =>
+          canChangeRoundness(element.type)
+            ? element.roundness?.value ?? 0
+            : null,
+        (element) => canChangeRoundness(element.type),
+        (hasSelection) =>
+          hasSelection ? null : appState.currentItemEdgeRoundness ?? 0,
+      ) ?? 0;
 
     return (
       <fieldset>
@@ -759,51 +733,13 @@ export const actionChangeEdgeRoundness = register({
           <input
             type="range"
             min="0"
-            max="50"
+            max={MAX_EDGE_ROUNDNESS}
             step="1"
-            value={
-              getFormValue(
-                elements,
-                app,
-                (element) => {
-                  if (canChangeRoundness(element.type)) {
-                    return element.roundness?.value || 0;
-                  }
-                  return null;
-                },
-                (element) => canChangeRoundness(element.type),
-                (hasSelection) =>
-                  hasSelection
-                    ? null
-                    : (appState as any).currentItemEdgeRoundness || 0,
-              ) || 0
-            }
+            value={roundness}
             onChange={(event) => updateData(+event.target.value)}
             style={{ width: "100%" }}
           />
-          <div
-            style={{ textAlign: "center", fontSize: "12px", marginTop: "4px" }}
-          >
-            {(() => {
-              const roundness =
-                getFormValue(
-                  elements,
-                  app,
-                  (element) => {
-                    if (canChangeRoundness(element.type)) {
-                      return element.roundness?.value || 0;
-                    }
-                    return null;
-                  },
-                  (element) => canChangeRoundness(element.type),
-                  (hasSelection) =>
-                    hasSelection
-                      ? null
-                      : (appState as any).currentItemEdgeRoundness || 0,
-                ) || 0;
-              return `${roundness}px`;
-            })()}
-          </div>
+          <div className="rangeValueLabel">{`${roundness}px`}</div>
         </div>
       </fieldset>
     );

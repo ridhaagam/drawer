@@ -14,6 +14,7 @@ import type {
 
 import { getElementAbsoluteCoords } from "./bounds";
 import {
+  is3DElement,
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
@@ -329,7 +330,7 @@ export const getTransformHandles = (
   );
 
   // Add depth handle for 3D shapes (cube and rectangular prism)
-  if (element.type === "cube" || element.type === "rectangularPrism") {
+  if (is3DElement(element)) {
     const [x1, y1, , , cx, cy] = getElementAbsoluteCoords(
       element,
       elementsMap,

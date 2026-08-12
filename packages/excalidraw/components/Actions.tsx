@@ -20,6 +20,7 @@ import {
   isArrowElement,
   hasStrokeColor,
   toolIsArrow,
+  is3DElementType,
 } from "@excalidraw/element";
 
 import type {
@@ -201,12 +202,8 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
 
-      {(appState.activeTool.type === "cube" ||
-        appState.activeTool.type === "rectangularPrism" ||
-        targetElements.some(
-          (element) =>
-            element.type === "cube" || element.type === "rectangularPrism",
-        )) &&
+      {(is3DElementType(appState.activeTool.type) ||
+        targetElements.some((element) => is3DElementType(element.type))) &&
         renderAction("change3DDepth")}
 
       {(appState.activeTool.type === "freedraw" ||
@@ -405,12 +402,9 @@ const CombinedShapeProperties = ({
                   hasStrokeWidth(element.type),
                 )) &&
                 renderAction("changeStrokeWidth")}
-              {(appState.activeTool.type === "cube" ||
-                appState.activeTool.type === "rectangularPrism" ||
-                targetElements.some(
-                  (element) =>
-                    element.type === "cube" ||
-                    element.type === "rectangularPrism",
+              {(is3DElementType(appState.activeTool.type) ||
+                targetElements.some((element) =>
+                  is3DElementType(element.type),
                 )) &&
                 renderAction("change3DDepth")}
               {(hasStrokeStyle(appState.activeTool.type) ||

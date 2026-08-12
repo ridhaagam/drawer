@@ -108,13 +108,13 @@ export const isRectangularPrismElement = (
   return element != null && element.type === "rectangularPrism";
 };
 
+export const is3DElementType = (type: string) =>
+  type === "cube" || type === "rectangularPrism";
+
 export const is3DElement = (
   element: ExcalidrawElement | null,
 ): element is Excalidraw3DElement => {
-  return (
-    element != null &&
-    (element.type === "cube" || element.type === "rectangularPrism")
-  );
+  return element != null && is3DElementType(element.type);
 };
 
 export const isFreeDrawElement = (
@@ -339,8 +339,7 @@ export const isUsingAdaptiveRadius = (type: string) =>
   type === "embeddable" ||
   type === "iframe" ||
   type === "image" ||
-  type === "cube" ||
-  type === "rectangularPrism";
+  is3DElementType(type);
 
 export const isUsingProportionalRadius = (type: string) =>
   type === "line" || type === "arrow" || type === "diamond";

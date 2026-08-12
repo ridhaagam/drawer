@@ -1,5 +1,7 @@
 import type { ElementOrToolType } from "@excalidraw/excalidraw/types";
 
+import { is3DElementType } from "./typeChecks";
+
 export const hasBackground = (type: ElementOrToolType) =>
   type === "rectangle" ||
   type === "iframe" ||
@@ -8,8 +10,7 @@ export const hasBackground = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "line" ||
   type === "freedraw" ||
-  type === "cube" ||
-  type === "rectangularPrism";
+  is3DElementType(type);
 
 export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "rectangle" ||
@@ -19,8 +20,7 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "arrow" ||
   type === "line" ||
   type === "text" ||
-  type === "cube" ||
-  type === "rectangularPrism";
+  is3DElementType(type);
 
 export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "rectangle" ||
@@ -31,8 +31,7 @@ export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "freedraw" ||
   type === "arrow" ||
   type === "line" ||
-  type === "cube" ||
-  type === "rectangularPrism";
+  is3DElementType(type);
 
 export const hasStrokeStyle = (type: ElementOrToolType) =>
   type === "rectangle" ||
@@ -42,8 +41,7 @@ export const hasStrokeStyle = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "arrow" ||
   type === "line" ||
-  type === "cube" ||
-  type === "rectangularPrism";
+  is3DElementType(type);
 
 export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "rectangle" ||
@@ -52,8 +50,7 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "line" ||
   type === "diamond" ||
   type === "image" ||
-  type === "cube" ||
-  type === "rectangularPrism";
+  is3DElementType(type);
 
 export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";
 

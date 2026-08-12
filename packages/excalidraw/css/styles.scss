@@ -196,6 +196,13 @@ body.excalidraw-cursor-resize * {
         font-size: 0.75rem;
       }
 
+      .rangeValueLabel {
+        width: 100%;
+        margin-top: 4px;
+        text-align: center;
+        font-size: 0.75rem;
+      }
+
       input[type="radio"],
       input[type="button"] {
         opacity: 0;

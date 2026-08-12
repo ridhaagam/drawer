@@ -38,6 +38,7 @@ import { ShapeCache } from "./shape";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
+  is3DElement,
   isArrowElement,
   isBoundToContainer,
   isFreeDrawElement,
@@ -220,7 +221,7 @@ export class ElementBounds {
       const ww = Math.hypot(w * cos, h * sin);
       const hh = Math.hypot(h * cos, w * sin);
       bounds = [cx - ww, cy - hh, cx + ww, cy + hh];
-    } else if (element.type === "cube" || element.type === "rectangularPrism") {
+    } else if (is3DElement(element)) {
       // For 3D shapes, use the actual projected bounds
       // Simply use the element's rectangle as bounds (element.x, element.y, element.width, element.height)
       // The shape generation already fits within these bounds

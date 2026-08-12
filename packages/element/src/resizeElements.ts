@@ -45,6 +45,7 @@ import {
 } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import {
+  is3DElement,
   isArrowElement,
   isBoundToContainer,
   isElbowArrow,
@@ -106,7 +107,7 @@ export const transformElements = (
       }
     } else if (transformHandleType === "depth") {
       // Handle depth adjustment for 3D shapes
-      if (element.type === "cube" || element.type === "rectangularPrism") {
+      if (is3DElement(element)) {
         adjust3DDepth(element, scene, pointerX, pointerY, originalElements);
       }
     } else if (transformHandleType) {
