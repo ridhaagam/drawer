@@ -30,3 +30,9 @@ export const MAX_SHARE_LINK_BYTES = int(
 );
 
 export const CORS_ORIGIN = process.env.CORS_ORIGIN || "";
+
+// body-parser matches raw bodies on the Content-Type header, and "*/*" still
+// requires one to be present. A PUT carrying bytes with no Content-Type is
+// legal and is what fetch() sends for a Uint8Array body, so match every
+// request instead of every declared type.
+export const ANY_CONTENT_TYPE = () => true;

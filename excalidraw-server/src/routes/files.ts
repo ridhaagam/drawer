@@ -3,7 +3,7 @@ import path from "path";
 
 import express from "express";
 
-import { MAX_FILE_BYTES } from "../config";
+import { ANY_CONTENT_TYPE, MAX_FILE_BYTES } from "../config";
 import { resolveFilePath } from "../validate";
 
 export const filesRouter = express.Router();
@@ -15,7 +15,7 @@ const splatOf = (req: express.Request) =>
 
 filesRouter.put(
   "/files/*",
-  express.raw({ type: "*/*", limit: MAX_FILE_BYTES }),
+  express.raw({ type: ANY_CONTENT_TYPE, limit: MAX_FILE_BYTES }),
   (req, res) => {
     const target = resolveFilePath(splatOf(req));
 

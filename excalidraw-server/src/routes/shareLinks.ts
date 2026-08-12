@@ -1,7 +1,7 @@
 import express from "express";
 import { nanoid } from "nanoid";
 
-import { MAX_SHARE_LINK_BYTES } from "../config";
+import { ANY_CONTENT_TYPE, MAX_SHARE_LINK_BYTES } from "../config";
 import { insertShareLink, selectShareLink } from "../db";
 import { isValidId } from "../validate";
 
@@ -11,7 +11,7 @@ const IMMUTABLE = "public, max-age=31536000, immutable";
 
 shareLinksRouter.post(
   "/v2/post/",
-  express.raw({ type: "*/*", limit: MAX_SHARE_LINK_BYTES }),
+  express.raw({ type: ANY_CONTENT_TYPE, limit: MAX_SHARE_LINK_BYTES }),
   (req, res) => {
     const payload = req.body as Buffer;
 
