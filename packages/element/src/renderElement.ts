@@ -15,6 +15,8 @@ import {
   DEFAULT_REDUCED_GLOBAL_ALPHA,
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
+  FREEDRAW_REAL_PRESSURE_OPTIONS,
+  FREEDRAW_SIMULATED_PRESSURE_OPTIONS,
   MIME_TYPES,
   THEME,
   distance,
@@ -1129,13 +1131,12 @@ export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
     ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
     : [[0, 0, 0.5]];
 
-  // Consider changing the options for simulated pressure vs real pressure
   const options: StrokeOptions = {
     simulatePressure: element.simulatePressure,
     size: element.strokeWidth * 4.25,
-    thinning: 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
+    ...(element.simulatePressure
+      ? FREEDRAW_SIMULATED_PRESSURE_OPTIONS
+      : FREEDRAW_REAL_PRESSURE_OPTIONS),
     easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
     last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
   };

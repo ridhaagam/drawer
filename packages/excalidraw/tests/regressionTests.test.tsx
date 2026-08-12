@@ -2,6 +2,7 @@ import React from "react";
 import { vi } from "vitest";
 
 import {
+  DEFAULT_FONT_FAMILY,
   FONT_FAMILY,
   CODES,
   KEYS,
@@ -655,7 +656,7 @@ describe("regression tests", () => {
 
   it("updates fontSize & fontFamily appState", () => {
     UI.clickTool("text");
-    expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY.Excalifont);
+    expect(h.state.currentItemFontFamily).toEqual(DEFAULT_FONT_FAMILY);
     fireEvent.click(screen.getByTitle(/code/i));
     expect(h.state.currentItemFontFamily).toEqual(FONT_FAMILY["Comic Shanns"]);
   });

@@ -88,22 +88,27 @@ const COMMON_ELEMENT_SHADES = pick(COLOR_PALETTE, [
 // quick picks defaults
 // -----------------------------------------------------------------------------
 
-// ORDER matters for positioning in quick picker
+// ORDER matters for positioning in quick picker.
+// Blue/orange/teal/violet instead of red/green/blue/yellow: red and green are
+// the classic confusion pair, and these four stay distinguishable under
+// deuteranopia and protanopia and separate in greyscale, which matters because
+// these end up in printed figures.
 export const DEFAULT_ELEMENT_STROKE_PICKS = [
   COLOR_PALETTE.black,
-  COLOR_PALETTE.red[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
-  COLOR_PALETTE.green[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
   COLOR_PALETTE.blue[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
-  COLOR_PALETTE.yellow[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
+  COLOR_PALETTE.orange[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
+  COLOR_PALETTE.teal[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
+  COLOR_PALETTE.violet[DEFAULT_ELEMENT_STROKE_COLOR_INDEX],
 ] as ColorTuple;
 
-// ORDER matters for positioning in quick picker
+// ORDER matters for positioning in quick picker; mirrors the stroke picks so a
+// shape and its outline come from the same hue.
 export const DEFAULT_ELEMENT_BACKGROUND_PICKS = [
   COLOR_PALETTE.transparent,
-  COLOR_PALETTE.red[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
-  COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
   COLOR_PALETTE.blue[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
-  COLOR_PALETTE.yellow[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
+  COLOR_PALETTE.orange[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
+  COLOR_PALETTE.teal[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
+  COLOR_PALETTE.violet[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
 ] as ColorTuple;
 
 // ORDER matters for positioning in quick picker

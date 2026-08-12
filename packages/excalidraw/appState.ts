@@ -125,7 +125,7 @@ export const getDefaultAppState = (): Omit<
       x: 0,
       y: 0,
     },
-    objectsSnapModeEnabled: false,
+    objectsSnapModeEnabled: true,
     userToFollow: null,
     followedBy: new Set(),
     isCropping: false,

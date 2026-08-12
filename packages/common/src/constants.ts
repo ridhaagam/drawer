@@ -201,7 +201,7 @@ export const FRAME_STYLE = {
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
-export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
+export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Nunito;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
@@ -409,6 +409,28 @@ export const STROKE_WIDTH = {
   extraBold: 4,
 } as const;
 
+// perfect-freehand tuning for the pen, split by input device.
+//
+// A mouse or trackpad reports no pressure and samples coarsely, so its jitter
+// shows up as visible wobble along the stroke. Smoothing it hard removes that
+// and gives the gliding line a pen is supposed to draw.
+//
+// A stylus reports real pressure, which is the detail worth keeping, so it
+// keeps the lighter original smoothing. Its thinning stays at 0.6: past roughly
+// that, a low-pressure segment thins to nothing and the outline degenerates
+// into a visible gap in the stroke.
+export const FREEDRAW_SIMULATED_PRESSURE_OPTIONS = {
+  thinning: 0.5,
+  smoothing: 0.85,
+  streamline: 0.75,
+} as const;
+
+export const FREEDRAW_REAL_PRESSURE_OPTIONS = {
+  thinning: 0.6,
+  smoothing: 0.5,
+  streamline: 0.5,
+} as const;
+
 export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: ExcalidrawElement["strokeColor"];
   backgroundColor: ExcalidrawElement["backgroundColor"];
@@ -424,7 +446,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   fillStyle: "solid",
   strokeWidth: 2,
   strokeStyle: "solid",
-  roughness: ROUGHNESS.artist,
+  roughness: ROUGHNESS.architect,
   opacity: 100,
   locked: false,
 };

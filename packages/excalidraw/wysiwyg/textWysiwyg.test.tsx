@@ -6,6 +6,8 @@ import { getOriginalContainerHeightFromCache } from "@excalidraw/element";
 import {
   CODES,
   KEYS,
+  DEFAULT_ELEMENT_PROPS,
+  DEFAULT_FONT_FAMILY,
   FONT_FAMILY,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
@@ -886,7 +888,7 @@ describe("textWysiwyg", () => {
 
       expect(h.state.editingTextElement).toBe(null);
 
-      expect(text.fontFamily).toEqual(FONT_FAMILY.Excalifont);
+      expect(text.fontFamily).toEqual(DEFAULT_FONT_FAMILY);
 
       fireEvent.click(screen.getByTitle(/code/i));
 
@@ -900,7 +902,7 @@ describe("textWysiwyg", () => {
       });
       expect(
         (h.elements[1] as ExcalidrawTextElementWithContainer).fontFamily,
-      ).toEqual(FONT_FAMILY.Excalifont);
+      ).toEqual(DEFAULT_FONT_FAMILY);
 
       //redo
       Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
@@ -1497,7 +1499,7 @@ describe("textWysiwyg", () => {
           link: null,
           locked: false,
           opacity: 100,
-          roughness: 1,
+          roughness: DEFAULT_ELEMENT_PROPS.roughness,
           roundness: null,
           strokeColor: "#1e1e1e",
           strokeStyle: "solid",
