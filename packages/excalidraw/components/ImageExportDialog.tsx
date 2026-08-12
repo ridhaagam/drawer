@@ -6,8 +6,12 @@ import {
   EXPORT_IMAGE_TYPES,
   isFirefox,
   EXPORT_SCALES,
+  EXPORT_UNITS,
+  EXPORT_WIDTH_PRESETS,
   cloneJSON,
 } from "@excalidraw/common";
+
+import type { ExportUnit } from "@excalidraw/common";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -15,6 +19,8 @@ import {
   actionExportWithDarkMode,
   actionChangeExportBackground,
   actionChangeExportEmbedScene,
+  actionChangeExportPadding,
+  actionChangeExportPhysicalWidth,
   actionChangeExportScale,
   actionChangeProjectName,
 } from "../actions/actionExport";
@@ -89,6 +95,12 @@ const ImageExportModal = ({
     appStateSnapshot.exportEmbedScene,
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
+  const [exportPadding, setExportPadding] = useState(
+    appStateSnapshot.exportPadding ?? DEFAULT_EXPORT_PADDING,
+  );
+  const [physicalWidth, setPhysicalWidth] = useState(
+    appStateSnapshot.exportPhysicalWidth,
+  );
 
   const previewRef = useRef<HTMLDivElement>(null);
   const [renderError, setRenderError] = useState<Error | null>(null);
@@ -104,6 +116,8 @@ const ImageExportModal = ({
     exportWithBackground,
     exportDarkMode,
     exportScale,
+    exportPadding,
+    physicalWidth,
     embedScene,
     resetCopyStatus,
   ]);
@@ -136,7 +150,7 @@ const ImageExportModal = ({
         exportEmbedScene: embedScene,
       },
       files,
-      exportPadding: DEFAULT_EXPORT_PADDING,
+      exportPadding,
       maxWidthOrHeight: Math.max(maxWidth, maxHeight),
       exportingFrame,
     })
@@ -168,6 +182,7 @@ const ImageExportModal = ({
     exportWithBackground,
     exportDarkMode,
     exportScale,
+    exportPadding,
     embedScene,
   ]);
 
@@ -284,6 +299,46 @@ const ImageExportModal = ({
             }))}
           />
         </ExportSetting>
+        <ExportSetting
+          label={t("imageExportDialog.label.padding")}
+          name="exportPadding"
+        >
+          <input
+            id="exportPadding"
+            className="ImageExportModal__settings__numberInput"
+            type="number"
+            min={0}
+            max={200}
+            step={1}
+            value={exportPadding}
+            onChange={(event) => {
+              const value = Math.max(0, Math.min(200, +event.target.value));
+              setExportPadding(value);
+              actionManager.executeAction(
+                actionChangeExportPadding,
+                "ui",
+                value,
+              );
+            }}
+          />
+        </ExportSetting>
+        <ExportSetting
+          label={t("imageExportDialog.label.physicalWidth")}
+          tooltip={t("imageExportDialog.tooltip.physicalWidth")}
+          name="exportPhysicalWidth"
+        >
+          <PhysicalWidthInput
+            value={physicalWidth}
+            onChange={(value) => {
+              setPhysicalWidth(value);
+              actionManager.executeAction(
+                actionChangeExportPhysicalWidth,
+                "ui",
+                value,
+              );
+            }}
+          />
+        </ExportSetting>
 
         <div className="ImageExportModal__settings__buttons">
           <FilledButton
@@ -341,6 +396,82 @@ type ExportSettingProps = {
   children: React.ReactNode;
   tooltip?: string;
   name?: string;
+};
+
+const PhysicalWidthInput = ({
+  value,
+  onChange,
+}: {
+  value: UIAppState["exportPhysicalWidth"];
+  onChange: (value: UIAppState["exportPhysicalWidth"]) => void;
+}) => {
+  const preset = EXPORT_WIDTH_PRESETS.find(
+    (candidate) =>
+      value != null &&
+      candidate.value === value.value &&
+      candidate.unit === value.unit,
+  );
+
+  return (
+    <div className="ImageExportModal__settings__physicalWidth">
+      <select
+        className="ImageExportModal__settings__select"
+        value={preset ? preset.label : value ? "custom" : "auto"}
+        onChange={(event) => {
+          if (event.target.value === "auto") {
+            onChange(null);
+            return;
+          }
+          const chosen = EXPORT_WIDTH_PRESETS.find(
+            (candidate) => candidate.label === event.target.value,
+          );
+          onChange(
+            chosen
+              ? { value: chosen.value, unit: chosen.unit }
+              : value ?? { value: 100, unit: "mm" },
+          );
+        }}
+      >
+        <option value="auto">Auto</option>
+        {EXPORT_WIDTH_PRESETS.map((candidate) => (
+          <option key={candidate.label} value={candidate.label}>
+            {candidate.label}
+          </option>
+        ))}
+        <option value="custom">Custom</option>
+      </select>
+      {value && (
+        <>
+          <input
+            className="ImageExportModal__settings__numberInput"
+            type="number"
+            min={0}
+            step={0.05}
+            value={value.value}
+            onChange={(event) =>
+              onChange({ value: +event.target.value, unit: value.unit })
+            }
+          />
+          <select
+            className="ImageExportModal__settings__select"
+            value={value.unit}
+            onChange={(event) =>
+              onChange({
+                value: value.value,
+                unit: event.target.value as ExportUnit,
+              })
+            }
+          >
+            {EXPORT_UNITS.map((unit) => (
+              <option key={unit} value={unit}>
+                {unit}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
+    </div>
+  );
 };
 
 const ExportSetting = ({

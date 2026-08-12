@@ -327,6 +327,25 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
 export const MAX_DECIMALS_FOR_SVG_EXPORT = 2;
 
 export const EXPORT_SCALES = [1, 2, 3];
+
+// Physical widths a figure is usually exported at. exportScale is a raster
+// concept and does nothing useful for SVG, where it only rescales the width and
+// height attributes while the viewBox stays put. Setting a real physical width
+// is what makes \includesvg land at the intended size on the page.
+export const EXPORT_UNITS = ["px", "pt", "mm", "in"] as const;
+
+export type ExportUnit = typeof EXPORT_UNITS[number];
+
+export const PT_PER_INCH = 72;
+export const MM_PER_INCH = 25.4;
+// CSS reference pixel
+export const PX_PER_INCH = 96;
+
+export const EXPORT_WIDTH_PRESETS = [
+  { label: "IEEE/CVPR column", value: 3.25, unit: "in" },
+  { label: "IEEE/CVPR full width", value: 6.875, unit: "in" },
+  { label: "A4 text width", value: 160, unit: "mm" },
+] as const;
 export const DEFAULT_EXPORT_PADDING = 10; // px
 
 export const DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT = 1440;

@@ -496,10 +496,12 @@
       "darkMode": "Dark mode",
       "embedScene": "Embed scene",
       "scale": "Scale",
-      "padding": "Padding"
+      "padding": "Padding",
+      "physicalWidth": "Width on the page"
     },
     "tooltip": {
-      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
+      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
+      "physicalWidth": "Sets the SVG's width in real units so it lands at the right size on the page. The height follows the aspect ratio. Only affects SVG; PNG resolution is set by Scale."
     },
     "title": {
       "exportToPng": "Export to PNG",

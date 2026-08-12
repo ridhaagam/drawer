@@ -42,6 +42,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportPadding": undefined,
+  "exportPhysicalWidth": null,
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,

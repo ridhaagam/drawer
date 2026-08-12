@@ -15,6 +15,8 @@ import {
   toBrandedType,
 } from "@excalidraw/common";
 
+import { round } from "@excalidraw/math";
+
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
@@ -48,6 +50,8 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
+
+import type { ExportUnit } from "@excalidraw/common";
 
 import { getDefaultAppState } from "../appState";
 import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
@@ -290,6 +294,7 @@ export const exportToSvg = async (
     viewBackgroundColor: string;
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
+    exportPhysicalWidth?: { value: number; unit: ExportUnit } | null;
     frameRendering?: AppState["frameRendering"];
   },
   files: BinaryFiles | null,
@@ -314,6 +319,7 @@ export const exportToSvg = async (
     viewBackgroundColor,
     exportScale = 1,
     exportEmbedScene,
+    exportPhysicalWidth = null,
   } = appState;
 
   const { exportingFrame = null } = opts || {};
@@ -346,8 +352,19 @@ export const exportToSvg = async (
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
-  svgRoot.setAttribute("width", `${width * exportScale}`);
-  svgRoot.setAttribute("height", `${height * exportScale}`);
+
+  // The viewBox is the coordinate system and never changes. Only the rendered
+  // size does, either as a bare multiple of the drawing or as a real physical
+  // width with the height following the aspect ratio.
+  if (exportPhysicalWidth && exportPhysicalWidth.value > 0) {
+    const { value, unit } = exportPhysicalWidth;
+    const renderedHeight = height === 0 ? 0 : (value * height) / width;
+    svgRoot.setAttribute("width", `${round(value, 4)}${unit}`);
+    svgRoot.setAttribute("height", `${round(renderedHeight, 4)}${unit}`);
+  } else {
+    svgRoot.setAttribute("width", `${width * exportScale}`);
+    svgRoot.setAttribute("height", `${height * exportScale}`);
+  }
   if (exportWithDarkMode) {
     svgRoot.setAttribute("filter", THEME_FILTER);
   }

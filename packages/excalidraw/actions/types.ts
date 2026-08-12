@@ -81,6 +81,8 @@ export type ActionName =
   | "changeExportBackground"
   | "changeExportEmbedScene"
   | "changeExportScale"
+  | "changeExportPadding"
+  | "changeExportPhysicalWidth"
   | "saveToActiveFile"
   | "saveFileToDisk"
   | "loadScene"

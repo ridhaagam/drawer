@@ -173,3 +173,32 @@
     }
   }
 }
+
+.excalidraw {
+  .ImageExportModal__settings__numberInput {
+    width: 4.5rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--default-border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--input-bg-color);
+    color: var(--text-primary-color);
+    font-size: 0.875rem;
+  }
+
+  .ImageExportModal__settings__select {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--default-border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--input-bg-color);
+    color: var(--text-primary-color);
+    font-size: 0.875rem;
+  }
+
+  .ImageExportModal__settings__physicalWidth {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+  }
+}

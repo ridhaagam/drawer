@@ -4,6 +4,7 @@ import type {
   throttleRAF,
   MIME_TYPES,
   EditorInterface,
+  ExportUnit,
 } from "@excalidraw/common";
 
 import type { SuggestedBinding } from "@excalidraw/element";
@@ -329,6 +330,8 @@ export interface AppState {
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
   exportScale: number;
+  exportPadding: number;
+  exportPhysicalWidth: { value: number; unit: ExportUnit } | null;
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];

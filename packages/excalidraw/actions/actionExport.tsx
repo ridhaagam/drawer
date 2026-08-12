@@ -101,6 +101,30 @@ export const actionChangeExportScale = register({
   },
 });
 
+export const actionChangeExportPadding = register({
+  name: "changeExportPadding",
+  label: "imageExportDialog.label.padding",
+  trackEvent: { category: "export", action: "padding" },
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportPadding: value },
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+});
+
+export const actionChangeExportPhysicalWidth = register({
+  name: "changeExportPhysicalWidth",
+  label: "imageExportDialog.label.physicalWidth",
+  trackEvent: { category: "export", action: "physicalWidth" },
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportPhysicalWidth: value },
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+});
+
 export const actionChangeExportBackground = register({
   name: "changeExportBackground",
   label: "imageExportDialog.label.withBackground",

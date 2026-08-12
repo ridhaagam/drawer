@@ -99,7 +99,7 @@ export const exportCanvas = async (
   files: BinaryFiles,
   {
     exportBackground,
-    exportPadding = DEFAULT_EXPORT_PADDING,
+    exportPadding = appState.exportPadding ?? DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
@@ -126,6 +126,7 @@ export const exportCanvas = async (
         viewBackgroundColor,
         exportPadding,
         exportScale: appState.exportScale,
+        exportPhysicalWidth: appState.exportPhysicalWidth,
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
       },
       files,
