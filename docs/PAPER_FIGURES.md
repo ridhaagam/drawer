@@ -39,17 +39,8 @@ There is no PDF export. `svg2pdf` needs TTF to embed text and this repo ships wo
 
 ## Architecture kit
 
-`Menu → Architecture kit` installs a set of ML-paper building blocks into the
-library: conv/linear/transformer/attention blocks, encoder and decoder stacks, a
-tensor cube, input and loss nodes, and data-flow and skip-connection arrows.
+`Menu → Architecture kit` installs a set of ML-paper building blocks into the library: conv/linear/transformer/attention blocks, encoder and decoder stacks, a tensor cube, input and loss nodes, and data-flow and skip-connection arrows.
 
-Every item spells out its own stroke, fill, roughness and font rather than
-inheriting the defaults, so the kit keeps looking the same even if the editor
-defaults change later. The colours come from the same colourblind-safe set as
-the quick picks, so items dropped from the kit match shapes drawn by hand.
+Every item spells out its own stroke, fill, roughness and font rather than inheriting the defaults, so the kit keeps looking the same even if the editor defaults change later. The colours come from the same colourblind-safe set as the quick picks, so items dropped from the kit match shapes drawn by hand.
 
-The tensor cube sets its depth to 0.3 of its width. A cube's default depth
-equals its width, and because the solid is fitted inside the element's box that
-projects to a flat slab rather than a cube; roughly a third is what actually
-reads as one. Worth knowing if you draw cubes by hand and wonder why they look
-flat: drag the depth handle down, or set 3D depth in the properties panel.
+The tensor cube sets its depth to 0.3 of its width. A cube's default depth equals its width, and because the solid is fitted inside the element's box that projects to a flat slab rather than a cube; roughly a third is what actually reads as one. Worth knowing if you draw cubes by hand and wonder why they look flat: drag the depth handle down, or set 3D depth in the properties panel.

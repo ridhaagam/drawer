@@ -8,6 +8,8 @@ import {
 } from "@excalidraw/math";
 
 import {
+  CUBE_DEPTH_RATIO,
+  PRISM_DEPTH_RATIO,
   MIN_FONT_SIZE,
   SHIFT_LOCKING_ANGLE,
   rescalePoints,
@@ -269,7 +271,8 @@ const adjust3DDepth = (
     rotationY: 0,
     rotationZ: 0,
     depth:
-      origElement.type === "cube" ? origElement.width : origElement.width * 0.6,
+      origElement.width *
+      (origElement.type === "cube" ? CUBE_DEPTH_RATIO : PRISM_DEPTH_RATIO),
     perspective: 500,
   };
   const rawOrigDepth = origShape3d.depth;

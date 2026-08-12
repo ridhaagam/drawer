@@ -1,5 +1,10 @@
 import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
-import { COLOR_PALETTE, FONT_FAMILY, ROUGHNESS } from "@excalidraw/common";
+import {
+  COLOR_PALETTE,
+  CUBE_DEPTH_RATIO,
+  FONT_FAMILY,
+  ROUGHNESS,
+} from "@excalidraw/common";
 
 import type { ExcalidrawElementSkeleton } from "@excalidraw/excalidraw/data/transform";
 import type { LibraryItems } from "@excalidraw/excalidraw/types";
@@ -30,11 +35,6 @@ const TINT = {
   violet: COLOR_PALETTE.violet[1],
   gray: COLOR_PALETTE.gray[1],
 } as const;
-
-// A cube whose depth equals its width projects to a slab, because the solid is
-// fitted inside the element box. Around a third of the width is what actually
-// reads as a cube.
-const CUBE_DEPTH_RATIO = 0.3;
 
 const block = (
   text: string,

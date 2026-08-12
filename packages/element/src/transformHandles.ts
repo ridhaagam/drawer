@@ -1,4 +1,6 @@
 import {
+  PRISM_DEPTH_RATIO,
+  CUBE_DEPTH_RATIO,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   type EditorInterface,
 } from "@excalidraw/common";
@@ -345,7 +347,9 @@ export const getTransformHandles = (
 
     // Get the current depth value (same calculation as in shape.ts)
     const shape3d = (element as any).customData?.shape3d || {};
-    const depth = shape3d.depth || (element.type === "cube" ? w : w * 0.6);
+    const depth =
+      shape3d.depth ||
+      w * (element.type === "cube" ? CUBE_DEPTH_RATIO : PRISM_DEPTH_RATIO);
 
     // Isometric projection constants (must match shape.ts)
     const cos30 = Math.sqrt(3) / 2;

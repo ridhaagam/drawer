@@ -394,7 +394,11 @@ export const MAX_EDGE_ROUNDNESS = 50;
 export const DEFAULT_3D_DEPTH = 100;
 export const MAX_3D_DEPTH = 500;
 export const DEFAULT_3D_PERSPECTIVE = 500;
-// A rectangular prism extrudes shallower than a cube, as a fraction of its width.
+// Default extrusion depth as a fraction of width. The solid is fitted inside
+// the element's box, so a cube whose depth equals its width projects to a flat
+// plate seen edge-on rather than to a cube; about a third is what reads as one.
+// A prism is meant to be the shallower of the two.
+export const CUBE_DEPTH_RATIO = 0.3;
 export const PRISM_DEPTH_RATIO = 0.6;
 // roundness type (algorithm)
 export const ROUNDNESS = {

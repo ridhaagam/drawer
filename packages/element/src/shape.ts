@@ -16,6 +16,8 @@ import {
   pointRotateRads,
 } from "@excalidraw/math";
 import {
+  CUBE_DEPTH_RATIO,
+  PRISM_DEPTH_RATIO,
   ROUGHNESS,
   isTransparent,
   assertNever,
@@ -636,7 +638,9 @@ const generate3DRectangularShapes = (
   isCube: boolean = false,
 ): Drawable[] => {
   const shape3d = element.customData?.shape3d || {};
-  const depth = shape3d.depth || (isCube ? element.width : element.width * 0.6);
+  const depth =
+    shape3d.depth ||
+    element.width * (isCube ? CUBE_DEPTH_RATIO : PRISM_DEPTH_RATIO);
 
   const w = element.width;
   const h = element.height;

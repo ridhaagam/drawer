@@ -1,4 +1,5 @@
 import {
+  CUBE_DEPTH_RATIO,
   DEFAULT_3D_DEPTH,
   DEFAULT_3D_PERSPECTIVE,
   DEFAULT_ELEMENT_PROPS,
@@ -237,7 +238,8 @@ export const newCubeElement = (
     ...baseOpts
   } = opts;
 
-  const actualDepth = depth ?? baseOpts.width ?? DEFAULT_3D_DEPTH;
+  const actualDepth =
+    depth ?? (baseOpts.width ?? DEFAULT_3D_DEPTH) * CUBE_DEPTH_RATIO;
 
   return _newElementBase<any>("cube", {
     ...baseOpts,
