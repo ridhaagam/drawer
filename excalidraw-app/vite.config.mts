@@ -19,6 +19,22 @@ export default defineConfig(({ mode }) => {
       open: true,
       // Allow access from local network for collaboration
       host: "0.0.0.0",
+      // reproduce the production single-origin layout, so relative API and
+      // websocket URLs work identically in dev. Note that reaching the dev
+      // server by IP is not a secure context, so crypto.subtle is undefined
+      // there and collaboration cannot encrypt: use localhost, or put
+      // `tailscale serve` in front.
+      proxy: {
+        "/api": {
+          target: "http://127.0.0.1:3010",
+          changeOrigin: false,
+        },
+        "/socket.io": {
+          target: "http://127.0.0.1:3005",
+          ws: true,
+          changeOrigin: false,
+        },
+      },
     },
     // We need to specify the envDir since now there are no
     //more located in parallel with the vite.config.ts file but in parent dir

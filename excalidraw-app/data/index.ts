@@ -32,12 +32,13 @@ import type { MakeBrand } from "@excalidraw/common/utility-types";
 
 import {
   DELETED_ELEMENT_TIMEOUT,
+  FILE_STORAGE_PREFIXES,
   FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
 } from "../app_constants";
 
 import { encodeFilesForUpload } from "./FileManager";
-import { saveFilesToFirebase } from "./firebase";
+import { saveFilesToServer } from "./server";
 
 import type { WS_SUBTYPES } from "../app_constants";
 
@@ -325,8 +326,8 @@ export const exportToBackend = async (
       url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
 
-      await saveFilesToFirebase({
-        prefix: `/files/shareLinks/${json.id}`,
+      await saveFilesToServer({
+        prefix: `${FILE_STORAGE_PREFIXES.shareLinkFiles}/${json.id}`,
         files: filesToUpload,
       });
 
