@@ -28,9 +28,9 @@ import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogPanels } from "./TTDDialogPanels";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
-import type { BinaryFiles } from "../../types";
-
 import "./TTDDialog.scss";
+
+import type { BinaryFiles } from "../../types";
 
 interface ResearchModeProps {
   onClose?: () => void;

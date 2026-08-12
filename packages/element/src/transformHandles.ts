@@ -330,7 +330,7 @@ export const getTransformHandles = (
 
   // Add depth handle for 3D shapes (cube and rectangular prism)
   if (element.type === "cube" || element.type === "rectangularPrism") {
-    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    const [x1, y1, , , cx, cy] = getElementAbsoluteCoords(
       element,
       elementsMap,
       true,

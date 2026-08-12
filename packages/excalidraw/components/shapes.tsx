@@ -56,7 +56,7 @@ export const SHAPES = [
   {
     icon: RectangularPrismIcon,
     value: "rectangularPrism",
-    key: KEYS.P,
+    key: KEYS.B,
     numericKey: null,
     fillable: true,
   },

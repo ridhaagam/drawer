@@ -276,7 +276,7 @@ const adjust3DDepth = (
   // Calculate original depth handle position (must match transformHandles.ts)
   const w = origElement.width;
   const h = origElement.height;
-  const [x1, y1] = getElementAbsoluteCoords(
+  const [, y1] = getElementAbsoluteCoords(
     origElement,
     scene.getNonDeletedElementsMap(),
   );
@@ -304,7 +304,10 @@ const adjust3DDepth = (
   const depthChange = deltaY / sin30;
 
   // Apply new depth within valid range
-  const newDepth = Math.max(-maxDepth, Math.min(maxDepth, origDepth + depthChange));
+  const newDepth = Math.max(
+    -maxDepth,
+    Math.min(maxDepth, origDepth + depthChange),
+  );
 
   // Update element
   scene.mutateElement(element, {

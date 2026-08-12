@@ -1,4 +1,5 @@
 node_modules/
+excalidraw-room/
 build/
 package-lock.json
 .vscode/
