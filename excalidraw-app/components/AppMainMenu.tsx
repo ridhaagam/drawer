@@ -21,6 +21,7 @@ export const AppMainMenu: React.FC<{
   isCollaborating: boolean;
   isCollabEnabled: boolean;
   onBoardsDialogOpen: () => any;
+  onInstallArchitectureKit: () => any;
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
@@ -42,6 +43,12 @@ export const AppMainMenu: React.FC<{
           Boards
         </MainMenu.Item>
       )}
+      <MainMenu.Item
+        icon={LibraryIcon}
+        onClick={props.onInstallArchitectureKit}
+      >
+        Architecture kit
+      </MainMenu.Item>
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
       <MainMenu.DefaultItems.SearchMenu />
       <MainMenu.DefaultItems.Help />

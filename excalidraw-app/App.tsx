@@ -95,6 +95,7 @@ import Collab, {
 import { AppFooter } from "./components/AppFooter";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
+import { buildArchitectureLibrary } from "./data/architectureLibrary";
 import { BoardsDialog } from "./components/BoardsDialog";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 
@@ -858,6 +859,13 @@ const ExcalidrawWrapper = () => {
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
           onBoardsDialogOpen={() => setBoardsDialogOpen(true)}
+          onInstallArchitectureKit={() =>
+            excalidrawAPI?.updateLibrary({
+              libraryItems: buildArchitectureLibrary(),
+              merge: true,
+              openLibraryMenu: true,
+            })
+          }
           isCollaborating={isCollaborating}
           isCollabEnabled={!isCollabDisabled}
           theme={appTheme}

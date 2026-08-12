@@ -447,6 +447,15 @@ const wrapLine = (
 
     // current line is empty => just the token (word) is longer than `maxWidth` and needs to be wrapped
     if (!currentLine) {
+      // a formula has no character-level break points: splitting it would hand
+      // the renderer a `$...$` span it can no longer parse, so an over-wide one
+      // overflows its container instead
+      if (isMathSpan(token)) {
+        lines.push(token);
+        iterator = tokenIterator.next();
+        continue;
+      }
+
       const wrappedWord = wrapWord(token, font, maxWidth);
       const trailingLine = wrappedWord[wrappedWord.length - 1] ?? "";
       const precedingLines = wrappedWord.slice(0, -1);
