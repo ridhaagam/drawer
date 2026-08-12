@@ -160,8 +160,15 @@ const measureRuns = (text: string, font: FontString) => {
   return textMetricsProvider.getLineWidth(text, font);
 };
 
-export const getLineWidth = (text: string, font: FontString) => {
-  if (!hasMath(text)) {
+// `ignoreMath` measures the literal characters instead of the formula they
+// stand for. The text editor needs that: it displays the raw `$...$` source, so
+// sizing it to the rendered width would leave the caret in the wrong place.
+export const getLineWidth = (
+  text: string,
+  font: FontString,
+  ignoreMath = false,
+) => {
+  if (ignoreMath || !hasMath(text)) {
     return measureRuns(text, font);
   }
 
@@ -179,11 +186,15 @@ export const getLineWidth = (text: string, font: FontString) => {
   }, 0);
 };
 
-export const getTextWidth = (text: string, font: FontString) => {
+export const getTextWidth = (
+  text: string,
+  font: FontString,
+  ignoreMath = false,
+) => {
   const lines = splitIntoLines(text);
   let width = 0;
   lines.forEach((line) => {
-    width = Math.max(width, getLineWidth(line, font));
+    width = Math.max(width, getLineWidth(line, font, ignoreMath));
   });
 
   return width;

@@ -102,7 +102,10 @@ export const getDefaultAppState = (): Omit<
     selectionElement: null,
     shouldCacheIgnoreZoom: false,
     stats: {
-      open: false,
+      // open by default: exact x/y/w/h entry is the difference between a
+      // figure that lines up and one that nearly does, and it is not
+      // discoverable while the panel is hidden
+      open: !isTestEnv(),
       panels: STATS_PANELS.generalStats | STATS_PANELS.elementProperties,
     },
     startBoundElement: null,

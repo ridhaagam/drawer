@@ -28,7 +28,7 @@ import {
   computeBoundTextPosition,
   getBoundTextElement,
 } from "@excalidraw/element";
-import { getTextWidth } from "@excalidraw/element";
+import { getTextWidth, hasMath } from "@excalidraw/element";
 import { normalizeText } from "@excalidraw/element";
 import { wrapText } from "@excalidraw/element";
 import {
@@ -147,7 +147,15 @@ export const textWysiwyg = ({
         app.scene.getNonDeletedElementsMap(),
       );
 
-      let width = updatedTextElement.width;
+      // the editor shows the raw `$...$` source, so it has to be sized to that
+      // rather than to the element, whose width is the rendered formula's
+      let width = hasMath(updatedTextElement.originalText)
+        ? getTextWidth(
+            updatedTextElement.text,
+            getFontString(updatedTextElement),
+            true,
+          )
+        : updatedTextElement.width;
 
       // set to element height by default since that's
       // what is going to be used for unbounded text
@@ -346,7 +354,7 @@ export const textWysiwyg = ({
           font,
           getBoundTextMaxWidth(container, boundTextElement),
         );
-        const width = getTextWidth(wrappedText, font);
+        const width = getTextWidth(wrappedText, font, true);
         editable.style.width = `${width}px`;
       }
     };
