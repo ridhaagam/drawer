@@ -28,4 +28,6 @@ html
 meta*.json
 .claude
 
-data
+# the docker bind mount for excalidraw-server, at the repo root only.
+# NOT excalidraw-app/data/, which is source.
+/data
