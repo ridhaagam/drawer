@@ -16,6 +16,7 @@ interface ImportMetaEnv {
   VITE_APP_AI_BACKEND: string;
 
   VITE_MCP_SERVER_URL: string;
+  VITE_APP_ENABLE_MCP: string;
 
   // whether to disable live reload / HMR. Usuaully what you want to do when
   // debugging Service Workers.

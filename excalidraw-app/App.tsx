@@ -885,7 +885,7 @@ const ExcalidrawWrapper = () => {
         </OverwriteConfirmDialog>
         <AppFooter onChange={() => excalidrawAPI?.refresh()} />
         {excalidrawAPI && <AIComponents excalidrawAPI={excalidrawAPI} />}
-        {import.meta.env.DEV && excalidrawAPI && (
+        {import.meta.env.VITE_APP_ENABLE_MCP !== "false" && excalidrawAPI && (
           <McpBridge excalidrawAPI={excalidrawAPI} />
         )}
 

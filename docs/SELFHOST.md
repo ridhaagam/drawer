@@ -53,6 +53,20 @@ Two things to understand about the security model:
 
 The board list in the main menu is stored per browser in localStorage. It is deliberately not on the server: a board name there would leak metadata that the end-to-end encryption otherwise protects.
 
+## Drawing from an assistant (MCP)
+
+The board can be driven from an MCP client, so an assistant draws onto the same canvas you have open. nginx proxies `/mcp/` to port 3003 on the host, which is where the canvas server from `mcp_excalidraw` listens:
+
+```bash
+cd ../mcp_excalidraw && PORT=3003 HOST=0.0.0.0 node dist/server.js
+```
+
+It runs on the host rather than in this stack so a clone of this repo still comes up without it. When nothing is listening the badge reads `MCP Disconnected` and the editor is unaffected.
+
+The bridge routes incoming shapes through the skeleton converter, so a shape sent with a `label` arrives with its caption bound inside it rather than dropped.
+
+**This channel has no authentication.** Anyone on the tailnet who opens the board can be drawn to by anything that can reach port 3003. That is the same trust boundary as the boards themselves, but it is a write path rather than a read one. Set `VITE_APP_ENABLE_MCP=false` at build time to leave the bridge out entirely.
+
 ## Backup
 
 Everything is one directory:

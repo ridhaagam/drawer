@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import {
   CaptureUpdateAction,
+  convertToExcalidrawElements,
   exportToBlob,
   exportToSvg,
 } from "@excalidraw/excalidraw";
@@ -8,9 +9,18 @@ import { restoreElements } from "@excalidraw/excalidraw/data/restore";
 
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
+// Same origin by default so the page can reach the bridge over the tailnet's
+// TLS. An ws:// socket opened from an https:// page is blocked as mixed
+// content, which is the same constraint that put everything else behind nginx.
 const MCP_SERVER_URL =
-  import.meta.env.VITE_MCP_SERVER_URL || "http://localhost:3003";
-const MCP_WS_URL = MCP_SERVER_URL.replace(/^http/, "ws");
+  import.meta.env.VITE_MCP_SERVER_URL ||
+  (typeof window === "undefined" ? "" : `${window.location.origin}/mcp`);
+// The socket URL keeps a trailing slash because the proxy location is /mcp/,
+// and a request to /mcp would fall through to the SPA instead of upgrading.
+const MCP_WS_URL = `${MCP_SERVER_URL.replace(/^http/, "ws").replace(
+  /\/$/,
+  "",
+)}/`;
 const RECONNECT_DELAY_MS = 3000;
 
 interface ServerElement {
@@ -86,6 +96,22 @@ const cleanElement = (el: ServerElement): Record<string, any> => {
   return { ...rest, version: 1 };
 };
 
+// The server speaks the skeleton dialect -- `label` for a shape's caption,
+// `start`/`end` for arrow bindings -- which only convertToExcalidrawElements
+// understands. restoreElements silently drops a label, so a shape drawn over
+// MCP would arrive with no text in it. Fall back to restore for anything the
+// skeleton converter does not know, such as the 3D types.
+const incomingToElements = (elements: ServerElement[]) => {
+  const cleaned = elements.map(cleanElement);
+  try {
+    return convertToExcalidrawElements(cleaned as any, {
+      regenerateIds: false,
+    });
+  } catch {
+    return restoreElements(cleaned as any, null, { repairBindings: true });
+  }
+};
+
 export default function McpBridge({
   excalidrawAPI,
 }: {
@@ -124,13 +150,8 @@ export default function McpBridge({
             if (!msg.elements?.length) {
               break;
             }
-            const restored = restoreElements(
-              msg.elements.map(cleanElement) as any,
-              null,
-              { repairBindings: true },
-            );
             api.updateScene({
-              elements: restored,
+              elements: incomingToElements(msg.elements),
               captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
             break;
@@ -140,14 +161,10 @@ export default function McpBridge({
             if (!msg.element) {
               break;
             }
-            const restored = restoreElements(
-              [cleanElement(msg.element) as any],
-              null,
-              { repairBindings: true },
-            );
-            if (restored.length) {
+            const created = incomingToElements([msg.element]);
+            if (created.length) {
               api.updateScene({
-                elements: [...current, ...restored],
+                elements: [...current, ...created],
                 captureUpdate: CaptureUpdateAction.IMMEDIATELY,
               });
             }
@@ -188,14 +205,10 @@ export default function McpBridge({
             if (!msg.elements) {
               break;
             }
-            const restored = restoreElements(
-              msg.elements.map(cleanElement) as any,
-              null,
-              { repairBindings: true },
-            );
-            if (restored.length) {
+            const created = incomingToElements(msg.elements);
+            if (created.length) {
               api.updateScene({
-                elements: [...current, ...restored],
+                elements: [...current, ...created],
                 captureUpdate: CaptureUpdateAction.IMMEDIATELY,
               });
             }

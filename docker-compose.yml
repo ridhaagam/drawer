@@ -6,6 +6,8 @@ services:
     container_name: excalidraw-app
     ports:
       - "3002:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - collab
       - persistence
