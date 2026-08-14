@@ -51,6 +51,58 @@ describe("architecture kit", () => {
     }
   });
 
+  // A label that breaks at a space is a two-line caption; one that breaks
+  // inside a word means the shape is too small for it. Rejoining the wrapped
+  // lines has to reproduce the source, which "conca" + "t" does not.
+  it("never splits a label mid-word", () => {
+    for (const item of lib) {
+      for (const el of item.elements) {
+        if (el.type !== "text" || !el.containerId) {
+          continue;
+        }
+        const source: string = ((el as any).originalText ?? "")
+          .replace(/\s+/g, " ")
+          .trim();
+        const rejoined = el.text
+          .split("\n")
+          .map((l) => l.trim())
+          .join(" ")
+          .replace(/\s+/g, " ")
+          .trim();
+        expect(`${item.name}: ${rejoined}`).toBe(`${item.name}: ${source}`);
+      }
+    }
+  });
+
+  // A connector runs in the gap between two shapes, so it never overlaps one
+  // horizontally -- but its lane must still sit within some shape's span, or
+  // it floats free of everything it is meant to join.
+  it("keeps every straight connector in line with a shape", () => {
+    for (const item of lib) {
+      const shapes = item.elements.filter(
+        (el) => el.type !== "arrow" && el.type !== "line" && el.type !== "text",
+      );
+      if (!shapes.length) {
+        continue;
+      }
+      for (const el of item.elements) {
+        if (el.type !== "arrow") {
+          continue;
+        }
+        const horizontal = Math.abs(el.height) < 2 && Math.abs(el.width) > 2;
+        if (!horizontal) {
+          continue;
+        }
+        const inLine = shapes.some(
+          (s) => el.y >= s.y - 1 && el.y <= s.y + s.height + 1,
+        );
+        expect(`${item.name} arrow y=${Math.round(el.y)}: ${inLine}`).toBe(
+          `${item.name} arrow y=${Math.round(el.y)}: true`,
+        );
+      }
+    }
+  });
+
   it("binds each arrow's label-bearing shapes so text stays inside", () => {
     for (const item of lib) {
       const containers = item.elements.filter((el) =>

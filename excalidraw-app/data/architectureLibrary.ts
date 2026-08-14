@@ -150,22 +150,31 @@ const arrowBetween = (
   b: Node,
   group?: string,
   extra: Record<string, unknown> = {},
+  // Fraction along the shared edge. Two arrows converging on one box both
+  // aim at its centre by default, so their heads land on top of each other.
+  ports: { from?: number; to?: number } = {},
 ): ExcalidrawElementSkeleton => {
-  const vertical = Math.abs(b.y - a.y) > Math.abs(b.x - a.x);
+  // Which way the arrow leaves is decided by the gap between the two boxes,
+  // not by the distance between their centres. Centres put a box that sits
+  // just below but slightly offset on the horizontal branch, and the arrow
+  // then leaves sideways and cuts back across its own source.
+  const yGap = Math.max(b.y - (a.y + a.h), a.y - (b.y + b.h));
+  const xGap = Math.max(b.x - (a.x + a.w), a.x - (b.x + b.w));
+  const vertical = yGap > xGap;
   let x1;
   let y1;
   let x2;
   let y2;
 
   if (vertical) {
-    x1 = a.x + a.w / 2;
-    x2 = b.x + b.w / 2;
+    x1 = a.x + a.w * (ports.from ?? 0.5);
+    x2 = b.x + b.w * (ports.to ?? 0.5);
     const down = b.y > a.y;
     y1 = down ? a.y + a.h + GAP : a.y - GAP;
     y2 = down ? b.y - GAP : b.y + b.h + GAP;
   } else {
-    y1 = a.y + a.h / 2;
-    y2 = b.y + b.h / 2;
+    y1 = a.y + a.h * (ports.from ?? 0.5);
+    y2 = b.y + b.h * (ports.to ?? 0.5);
     const right = b.x > a.x;
     x1 = right ? a.x + a.w + GAP : a.x - GAP;
     x2 = right ? b.x - GAP : b.x + b.w + GAP;
@@ -498,7 +507,7 @@ const residualBlock = (): ExcalidrawElementSkeleton[] => {
       strokeStyle: "dashed",
       groupIds: [g],
     } as unknown as ExcalidrawElementSkeleton,
-    caption(laneX + 14, col[2].y, "identity", g),
+    caption(laneX + 30, col[2].y - 10, "identity", g),
   ];
 };
 
@@ -536,7 +545,7 @@ const uNet = (): ExcalidrawElementSkeleton[] => {
     ...nodes(b, bottleneck, g),
     ...chain(l, g),
     arrowBetween(l[2], b[0], g),
-    arrowBetween(b[0], r[2], g),
+    arrowBetween(b[0], r[2], g, {}, { to: 0.78 }),
     arrowBetween(r[2], r[1], g),
     arrowBetween(r[1], r[0], g),
     ...skips,
@@ -585,8 +594,8 @@ const gan = (): ExcalidrawElementSkeleton[] => {
     ...nodes(b, bottom, g),
     ...nodes(d, disc, g),
     ...chain(t, g),
-    arrowBetween(t[2], d[0], g),
-    arrowBetween(b[0], d[0], g),
+    arrowBetween(t[2], d[0], g, {}, { to: 0.28 }),
+    arrowBetween(b[0], d[0], g, {}, { to: 0.72 }),
     arrowBetween(d[0], d[1], g),
   ];
 };
@@ -630,9 +639,11 @@ const diffusion = (): ExcalidrawElementSkeleton[] => {
     } as unknown as ExcalidrawElementSkeleton;
   };
 
-  const forward = row.slice(0, -1).map((n, i) => lane(n, row[i + 1], 30, {}));
+  const forward = row
+    .slice(0, -1)
+    .map((n, i) => lane(n, row[i + 1], n.h * 0.3, {}));
   const back = row.slice(0, -1).map((n, i) =>
-    lane(row[i + 1], n, 68, {
+    lane(row[i + 1], n, row[i + 1].h * 0.72, {
       strokeStyle: "dashed",
       strokeColor: COLOR_PALETTE.violet[3],
     }),
@@ -695,8 +706,8 @@ const attentionDetail = (): ExcalidrawElementSkeleton[] => {
     ...nodes(q, qkv.slice(0, 2), g),
     ...nodes(v, [qkv[2]], g),
     ...nodes(col, pipeline, g),
-    arrowBetween(q[0], col[0], g, { start: null }),
-    arrowBetween(q[1], col[0], g, { start: null }),
+    arrowBetween(q[0], col[0], g, { start: null, end: null }, { to: 0.3 }),
+    arrowBetween(q[1], col[0], g, { start: null, end: null }, { to: 0.7 }),
     {
       type: "arrow",
       x: laneX,
@@ -755,7 +766,7 @@ const trainingLoop = (): ExcalidrawElementSkeleton[] => {
       strokeStyle: "dashed",
       groupIds: [g],
     } as unknown as ExcalidrawElementSkeleton,
-    caption(row[1].x + 10, backY + 8, "gradient update", g),
+    caption(row[1].x + 24, backY + 20, "gradient update", g),
   ];
 };
 
@@ -785,8 +796,8 @@ const multimodal = (): ExcalidrawElementSkeleton[] => {
     ...nodes(h, head, g),
     ...chain(i, g),
     ...chain(t, g),
-    arrowBetween(i[1], h[0], g),
-    arrowBetween(t[1], h[0], g),
+    arrowBetween(i[1], h[0], g, {}, { to: 0.28 }),
+    arrowBetween(t[1], h[0], g, {}, { to: 0.72 }),
     arrowBetween(h[0], h[1], g),
   ];
 };
@@ -802,7 +813,10 @@ const ITEMS: { name: string; skeleton: ExcalidrawElementSkeleton[] }[] = [
   { name: "Linear / MLP", skeleton: block("Linear", TINT.teal) },
   { name: "Transformer block", skeleton: block("Transformer", TINT.violet) },
   { name: "Attention head", skeleton: block("Self-Attention", TINT.orange) },
-  { name: "Cross attention", skeleton: block("Cross-Attention", TINT.orange) },
+  {
+    name: "Cross attention",
+    skeleton: block("Cross-Attention", TINT.orange, 190, 60),
+  },
   { name: "Normalisation", skeleton: block("LayerNorm", TINT.gray, 150, 44) },
   { name: "Activation", skeleton: block("GELU", TINT.gray, 110, 44) },
   { name: "Dropout", skeleton: block("Dropout", TINT.gray, 120, 44) },
@@ -816,7 +830,7 @@ const ITEMS: { name: string; skeleton: ExcalidrawElementSkeleton[] }[] = [
     name: "Add / residual",
     skeleton: shaped("⊕", TINT.orange, "ellipse", 60, 60),
   },
-  { name: "Concat", skeleton: shaped("concat", TINT.gray, "ellipse", 96, 60) },
+  { name: "Concat", skeleton: shaped("concat", TINT.gray, "ellipse", 150, 78) },
   { name: "Input", skeleton: shaped("Input", TINT.gray, "ellipse", 120, 56) },
   {
     name: "Output",
