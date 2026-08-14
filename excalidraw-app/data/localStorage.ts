@@ -3,7 +3,11 @@ import {
   getDefaultAppState,
 } from "@excalidraw/excalidraw/appState";
 import { clearElementsForLocalStorage } from "@excalidraw/element";
-import { DEFAULT_ELEMENT_PROPS, DEFAULT_FONT_FAMILY } from "@excalidraw/common";
+import {
+  DEFAULT_ARROWHEAD,
+  DEFAULT_ELEMENT_PROPS,
+  DEFAULT_FONT_FAMILY,
+} from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -36,13 +40,13 @@ export const importUsernameFromLocalStorage = (): string | null => {
   return null;
 };
 
-const FREEFORM_STYLE_MIGRATION = "freeform-1";
+const FREEFORM_STYLE_MIGRATION = "freeform-2";
 
-// The freeform restyle changed DEFAULT_FONT_FAMILY and
-// DEFAULT_ELEMENT_PROPS.roughness, but currentItem* values are persisted per
+// The freeform restyle changed DEFAULT_FONT_FAMILY, DEFAULT_ELEMENT_PROPS
+// .roughness and DEFAULT_ARROWHEAD, but currentItem* values are persisted per
 // browser, so anyone who has already used the app keeps drawing in the old
-// hand-drawn style. Rewrite those two once, then get out of the way so the
-// picker still works.
+// hand-drawn style. Rewrite those once, then get out of the way so the
+// pickers still work.
 const migrateStoredStyleDefaults = (savedState: string): string => {
   try {
     if (
@@ -57,6 +61,7 @@ const migrateStoredStyleDefaults = (savedState: string): string => {
       ...parsed,
       currentItemFontFamily: DEFAULT_FONT_FAMILY,
       currentItemRoughness: DEFAULT_ELEMENT_PROPS.roughness,
+      currentItemEndArrowhead: DEFAULT_ARROWHEAD,
     });
 
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE, migrated);

@@ -20,7 +20,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "currentItemArrowType": "round",
   "currentItemBackgroundColor": "transparent",
   "currentItemEdgeRoundness": 0,
-  "currentItemEndArrowhead": "arrow",
+  "currentItemEndArrowhead": "triangle",
   "currentItemFillStyle": "solid",
   "currentItemFontFamily": 6,
   "currentItemFontSize": 20,

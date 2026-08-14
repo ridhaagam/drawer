@@ -2,6 +2,7 @@ import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
 import {
   COLOR_PALETTE,
   CUBE_DEPTH_RATIO,
+  DEFAULT_ARROWHEAD,
   FONT_FAMILY,
   ROUGHNESS,
 } from "@excalidraw/common";
@@ -166,7 +167,7 @@ const ITEMS: { name: string; skeleton: ExcalidrawElementSkeleton[] }[] = [
         y: 0,
         width: 100,
         height: 0,
-        endArrowhead: "arrow",
+        endArrowhead: DEFAULT_ARROWHEAD,
         ...BASE,
       },
     ],
@@ -183,7 +184,7 @@ const ITEMS: { name: string; skeleton: ExcalidrawElementSkeleton[] }[] = [
           [60, -56],
           [130, 0],
         ] as any,
-        endArrowhead: "arrow",
+        endArrowhead: DEFAULT_ARROWHEAD,
         ...BASE,
         strokeStyle: "dashed",
       } as ExcalidrawElementSkeleton,

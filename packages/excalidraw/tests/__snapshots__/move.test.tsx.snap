@@ -177,7 +177,7 @@ exports[`move element > rectangles with binding arrow 7`] = `
   "boundElements": null,
   "customData": undefined,
   "elbowed": false,
-  "endArrowhead": "arrow",
+  "endArrowhead": "triangle",
   "endBinding": {
     "elementId": "id3",
     "focus": "-0.46667",

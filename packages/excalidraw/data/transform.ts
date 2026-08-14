@@ -1,6 +1,7 @@
 import { pointFrom, type LocalPoint } from "@excalidraw/math";
 
 import {
+  DEFAULT_ARROWHEAD,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   TEXT_ALIGN,
@@ -565,7 +566,7 @@ export const convertToExcalidrawElements = (
         excalidrawElement = newArrowElement({
           width,
           height,
-          endArrowhead: "arrow",
+          endArrowhead: DEFAULT_ARROWHEAD,
           points: [pointFrom(0, 0), pointFrom(width, height)],
           ...element,
           type: "arrow",

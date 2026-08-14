@@ -581,7 +581,8 @@ export const convertElementTypes = (
             );
             mutateElement(element, app.scene.getNonDeletedElementsMap(), {
               ...updates,
-              endArrowhead: "arrow",
+              endArrowhead:
+                element.endArrowhead ?? app.state.currentItemEndArrowhead,
             });
           } else {
             // if we're converting to non-elbow linear element, check if

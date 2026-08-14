@@ -454,6 +454,11 @@ export const FREEDRAW_REAL_PRESSURE_OPTIONS = {
   streamline: 0.5,
 } as const;
 
+// A chevron is two separate strokes meeting at a point, so at the sizes a
+// figure ends up in a paper column its vertex forks and it stops reading as an
+// arrow terminus. A filled triangle survives the reduction.
+export const DEFAULT_ARROWHEAD = "triangle";
+
 export const DEFAULT_ELEMENT_PROPS: {
   strokeColor: ExcalidrawElement["strokeColor"];
   backgroundColor: ExcalidrawElement["backgroundColor"];
