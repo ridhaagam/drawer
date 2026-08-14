@@ -30,6 +30,12 @@ Because the width is already correct, `\includesvg` needs no scaling factor and 
 
 There is no PDF export. `svg2pdf` needs TTF to embed text and this repo ships woff2, and every route out of that needs glyph outlines from woff2, so they all fail the same way. SVG carries real `<text>` nodes with the fonts subsetted and embedded, and math is already vector paths, so the SVG path is the supported one. If a venue insists on PDF, `inkscape --export-type=pdf figure.svg` converts losslessly.
 
+## Arrows
+
+Arrows end in a filled triangle. The alternative, a chevron, is two strokes meeting at a point, and at the size a figure ends up in a column its vertex forks and it stops reading as a terminus; a filled triangle survives the reduction. Every other head is still in the properties panel, and a saved drawing opens with the head it was stored with.
+
+Curved and elbow arrows carry the same head, so a diagram mixing the two stays consistent. Elbow corners are rounded.
+
 ## Precision
 
 - Object snapping is on by default; hold Ctrl/Cmd to suspend it while dragging.
@@ -42,5 +48,7 @@ There is no PDF export. `svg2pdf` needs TTF to embed text and this repo ships wo
 `Menu → Architecture kit` installs a set of ML-paper building blocks into the library: conv/linear/transformer/attention blocks, encoder and decoder stacks, a tensor cube, input and loss nodes, and data-flow and skip-connection arrows.
 
 Every item spells out its own stroke, fill, roughness and font rather than inheriting the defaults, so the kit keeps looking the same even if the editor defaults change later. The colours come from the same colourblind-safe set as the quick picks, so items dropped from the kit match shapes drawn by hand.
+
+Because the kit is a snapshot, an already-installed copy keeps whatever the defaults were on the day it was installed. Selecting `Architecture kit` again replaces the twelve items in place -- it does not duplicate them -- so re-run it after an editor restyle to pull the kit back in line.
 
 Cubes extrude to 0.3 of their width. The solid is fitted inside the element's box, so a cube whose depth equalled its width -- the old default -- projected to a flat plate seen edge-on rather than to a cube. Adjust any individual shape with the depth handle, or with 3D depth in the properties panel; a saved drawing keeps whatever depth it was stored with.
