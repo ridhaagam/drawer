@@ -147,7 +147,11 @@ export default function McpBridge({
       try {
         switch (msg.type) {
           case "initial_elements": {
-            if (!msg.elements?.length) {
+            // Only seed an empty canvas. The server replays its whole store on
+            // every connect, so applying this unconditionally overwrites
+            // whatever the page had already loaded -- a shared link, a board,
+            // or work in progress -- with the last thing MCP happened to draw.
+            if (!msg.elements?.length || current.length > 0) {
               break;
             }
             api.updateScene({
